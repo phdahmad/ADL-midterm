@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم المدرس — Advanced Deep Learning (AI4203)</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, sans-serif;
+    background: #f1f5f9;
+    min-height: 100vh;
+    color: #1e293b;
+  }
+  .login-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #1e3a8a 100%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .login-card {
+    background: white; border-radius: 24px; padding: 50px 40px;
+    max-width: 460px; width: 100%;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.4); text-align: center;
+  }
+  .login-card .logo {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 20px; color: white; font-size: 36px;
+  }
+  .login-card h1 { font-size: 24px; color: #0f172a; margin-bottom: 8px; font-weight: 900; }
+  .login-card .subtitle { color: #64748b; font-size: 15px; margin-bottom: 30px; }
+  .form-group { margin-bottom: 20px; text-align: right; }
+  .form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: #334155; font-size: 14px; }
+  .form-group input {
+    width: 100%; padding: 16px 20px;
+    border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 18px; font-family: inherit; transition: all 0.2s;
+    text-align: center; font-weight: 700;
+  }
+  .form-group input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+  .btn-login {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    color: white; border: none; border-radius: 12px;
+    font-size: 17px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(124,58,237,0.4); }
+  .error-msg {
+    margin-top: 16px; padding: 12px;
+    background: #fef2f2; color: #dc2626;
+    border-radius: 8px; font-size: 14px; font-weight: 500; display: none;
+  }
+  .error-msg.show { display: block; }
+
+  .dashboard { display: none; }
+  .dashboard.active { display: block; }
+  .topbar {
+    background: white; padding: 18px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .topbar .brand { display: flex; align-items: center; gap: 12px; }
+  .topbar .brand-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 900; font-size: 16px;
+  }
+  .topbar .brand-text h1 { font-size: 18px; color: #0f172a; font-weight: 900; }
+  .topbar .brand-text p { font-size: 12px; color: #64748b; }
+  .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer;
+    font-weight: 700; font-size: 14px; font-family: inherit;
+    text-decoration: none; display: inline-flex; align-items: center;
+    gap: 6px; transition: all 0.15s;
+  }
+  .btn-primary { background: #7c3aed; color: white; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-secondary { background: #f1f5f9; color: #1e293b; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-danger { background: #fef2f2; color: #dc2626; }
+  .btn-danger:hover { background: #fee2e2; }
+
+  .container { padding: 24px 30px; max-width: 1400px; margin: 0 auto; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white; border-radius: 16px; padding: 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border-top: 4px solid #7c3aed;
+  }
+  .stat-card.green  { border-top-color: #10b981; }
+  .stat-card.blue   { border-top-color: #2563eb; }
+  .stat-card.orange { border-top-color: #f59e0b; }
+  .stat-card.red    { border-top-color: #ef4444; }
+  .stat-card.purple { border-top-color: #7c3aed; }
+  .stat-card .label { color: #64748b; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+  .stat-card .value { font-size: 30px; font-weight: 900; color: #0f172a; line-height: 1; }
+  .stat-card .sub   { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+  .panel {
+    background: white; border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    margin-bottom: 24px; overflow: hidden;
+  }
+  .panel-header {
+    padding: 20px 24px; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .panel-header h2 { font-size: 18px; color: #0f172a; font-weight: 900; }
+  .panel-body { padding: 24px; }
+
+  /* Distribution chart */
+  .dist-chart { display: flex; flex-direction: column; gap: 10px; }
+  .dist-row {
+    display: grid; grid-template-columns: 140px 1fr 90px;
+    align-items: center; gap: 12px;
+  }
+  .dist-label { font-weight: 700; font-size: 13px; }
+  .dist-bar {
+    height: 26px; background: #f1f5f9;
+    border-radius: 6px; overflow: hidden;
+  }
+  .dist-fill {
+    height: 100%; border-radius: 6px;
+    transition: width 1s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-left: 12px; color: white; font-weight: 700; font-size: 12px;
+  }
+  .dist-empty {
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    color: #cbd5e1; font-size: 11px; font-style: italic;
+  }
+  .dist-count { text-align: left; color: #64748b; font-size: 12px; font-weight: 500; }
+
+  /* Students table */
+  .students-table { width: 100%; border-collapse: collapse; }
+  .students-table th {
+    background: #f8fafc; padding: 12px 14px;
+    text-align: right; font-weight: 700; color: #475569; font-size: 13px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .students-table td {
+    padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 14px;
+  }
+  .students-table tr:hover td { background: #f8fafc; }
+  .students-table .rank {
+    width: 34px; height: 34px;
+    background: #eff6ff; color: #1d4ed8;
+    border-radius: 50%; display: inline-flex;
+    align-items: center; justify-content: center;
+    font-weight: 900; font-size: 13px;
+  }
+  .students-table .rank.gold   { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+  .students-table .rank.silver { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: white; }
+  .students-table .rank.bronze { background: linear-gradient(135deg, #d97706, #92400e); color: white; }
+  .students-table .student-name { font-weight: 700; color: #0f172a; }
+  .students-table .uid { font-size: 12px; color: #64748b; direction: ltr; display: inline-block; }
+  .group-pill {
+    display: inline-block; padding: 3px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    background: #f3e8ff; color: #6b21a8;
+  }
+  .group-pill.g2 { background: #dbeafe; color: #1e40af; }
+  .score-pill {
+    display: inline-block; padding: 4px 12px; border-radius: 8px;
+    font-weight: 900; font-size: 13px;
+  }
+  .tier-pill {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    color: white; font-weight: 700; font-size: 12px;
+  }
+  .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+  .action-btn {
+    padding: 6px 11px; border-radius: 7px; border: 1px solid transparent;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; font-family: inherit;
+    transition: all 0.15s; text-decoration: none; white-space: nowrap;
+  }
+  .view-btn   { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+  .view-btn:hover { background: #ddd6fe; }
+  .report-btn { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+  .report-btn:hover { background: #bfdbfe; }
+  .answer-btn { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .answer-btn:hover { background: #fde68a; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.75); z-index: 100;
+    align-items: flex-start; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 20px;
+    max-width: 1000px; width: 100%; margin: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-header {
+    padding: 22px 28px; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-header h2 { font-size: 20px; color: #0f172a; }
+  .modal-close {
+    background: #f1f5f9; border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; font-size: 20px; color: #475569;
+  }
+  .modal-body { padding: 24px 28px; }
+
+  .modal-grade-row {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 30px; align-items: center;
+    padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+  }
+  .modal-circle { width: 130px; height: 130px; position: relative; }
+  .modal-circle svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .modal-circle .text-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+  }
+  .modal-circle .percent { font-size: 24px; font-weight: 900; color: #0f172a; }
+  .modal-circle .of { font-size: 12px; color: #64748b; }
+
+  .modal-section { margin-bottom: 22px; }
+  .modal-section h3 {
+    font-size: 16px; color: #0f172a;
+    margin-bottom: 14px; font-weight: 900;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .modal-section h3::before {
+    content: ''; width: 4px; height: 18px;
+    background: linear-gradient(180deg, #7c3aed, #db2777);
+    border-radius: 2px;
+  }
+  .breakdown-grid-modal {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .breakdown-modal {
+    background: #f8fafc; padding: 14px;
+    border-radius: 10px; border-right: 3px solid #7c3aed;
+  }
+  .breakdown-modal .name { font-size: 12px; color: #475569; margin-bottom: 6px; }
+  .breakdown-modal .val { font-size: 18px; font-weight: 900; color: #0f172a; }
+  .breakdown-modal .of  { font-size: 12px; color: #94a3b8; }
+
+  .notes-box {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px; padding: 14px 18px;
+    border-right: 4px solid #f59e0b;
+    color: #78350f; line-height: 1.7; font-size: 13px;
+  }
+  .qtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .qtable th {
+    background: #f8fafc; padding: 10px 8px;
+    text-align: right; font-weight: 700;
+    color: #475569; border-bottom: 1px solid #e2e8f0;
+  }
+  .qtable td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f1f5f9; vertical-align: top;
+  }
+  .q-badge2 {
+    background: #ede9fe; color: #6d28d9;
+    padding: 3px 8px; border-radius: 5px;
+    font-weight: 700; font-size: 12px;
+  }
+  .status-correct { background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .status-wrong   { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .status-partial { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+
+  .modal-actions {
+    display: flex; gap: 10px;
+    padding-top: 20px; border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .search-box input {
+    flex: 1; min-width: 220px;
+    padding: 12px 18px; border: 1px solid #e2e8f0; border-radius: 10px;
+    font-family: inherit; font-size: 14px;
+  }
+  .search-box input:focus { outline: none; border-color: #7c3aed; }
+  .search-box select {
+    padding: 12px 16px; border: 1px solid #e2e8f0;
+    border-radius: 10px; font-family: inherit; font-size: 14px;
+    background: white; cursor: pointer;
+  }
+
+  /* ---------- Activity panel ---------- */
+  .refresh-btn {
+    background: #ede9fe; color: #6d28d9; border: none;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    font-weight: 700; font-family: inherit; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .refresh-btn:hover { background: #ddd6fe; }
+  .refresh-btn.spinning { opacity: 0.6; pointer-events: none; }
+  .activity-loading {
+    text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;
+  }
+  .activity-error {
+    background: #fef2f2; color: #991b1b;
+    padding: 16px; border-radius: 8px;
+    margin: 16px 0; font-size: 14px;
+    line-height: 1.7;
+  }
+  .activity-error code {
+    background: white; padding: 2px 6px; border-radius: 4px;
+    font-family: Consolas, monospace; font-size: 12px;
+  }
+  .activity-section { margin-bottom: 24px; }
+  .activity-section h3 {
+    font-size: 16px; color: #0f172a;
+    margin-bottom: 14px; font-weight: 900;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .activity-section h3::before {
+    content: ''; width: 4px; height: 18px;
+    background: linear-gradient(180deg, #7c3aed, #db2777);
+    border-radius: 2px;
+  }
+  .day-chart {
+    display: flex; gap: 8px; align-items: flex-end;
+    height: 160px; border-bottom: 1px solid #e2e8f0;
+    padding: 20px 0 10px 0; overflow-x: auto;
+  }
+  .day-bar-wrap {
+    flex: 1; min-width: 50px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .day-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #a78bfa, #7c3aed);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px; position: relative;
+    transition: height 0.5s ease;
+  }
+  .day-bar-count {
+    position: absolute; top: -22px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px; font-weight: 700; color: #475569;
+  }
+  .day-bar-label {
+    font-size: 11px; color: #64748b;
+    white-space: nowrap; text-align: center;
+  }
+  .activity-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .activity-table th {
+    background: #f8fafc; padding: 12px 10px;
+    text-align: right; font-weight: 700;
+    color: #475569; border-bottom: 2px solid #e2e8f0;
+    font-size: 12px;
+  }
+  .activity-table td {
+    padding: 12px 10px; border-bottom: 1px solid #f1f5f9;
+  }
+  .activity-table tr:hover td { background: #f8fafc; }
+  .badge-success  { background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-fail     { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-not-yet  { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .badge-device   { background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+  .activity-log-list {
+    max-height: 400px; overflow-y: auto;
+    border: 1px solid #e2e8f0; border-radius: 8px;
+  }
+  .log-row {
+    padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 16px; align-items: center; font-size: 13px;
+  }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .time {
+    color: #64748b; font-size: 12px;
+    direction: ltr; text-align: right; font-weight: 500;
+  }
+  .log-row .who { font-weight: 700; color: #0f172a; }
+  .log-row .who .uid-small {
+    font-size: 11px; color: #94a3b8;
+    direction: ltr; display: inline-block; margin-right: 6px;
+  }
+  .empty-msg {
+    text-align: center; color: #94a3b8;
+    padding: 30px; font-size: 13px;
+  }
+  .absent-pill {
+    display: inline-block;
+    background: #fef2f2; color: #991b1b;
+    padding: 7px 14px; border-radius: 999px;
+    margin: 4px; font-size: 12px; font-weight: 700;
+  }
+  .absent-pill .grp {
+    background: rgba(220,38,38,0.15);
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 10px; margin-right: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .login-card { padding: 32px 22px; max-width: 92%; }
+    .login-card h1 { font-size: 20px; }
+    .form-group input { font-size: 16px; padding: 14px 16px; }
+    .btn-login { font-size: 16px; padding: 14px; }
+    .topbar { padding: 12px 14px; flex-direction: column; align-items: stretch; gap: 10px; }
+    .topbar .brand { justify-content: center; }
+    .topbar-actions { justify-content: center; flex-wrap: wrap; }
+    .topbar-actions .btn { font-size: 12px; padding: 8px 12px; }
+    .container { padding: 14px 12px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-card { padding: 14px 12px; }
+    .stat-card .value { font-size: 20px; }
+    .stat-card .label { font-size: 11px; }
+    .panel-header { padding: 14px 16px; }
+    .panel-header h2 { font-size: 16px; }
+    .panel-body { padding: 16px 12px; }
+    .dist-row { grid-template-columns: 110px 1fr 70px; gap: 8px; }
+    .dist-label { font-size: 11px; }
+    .search-box { flex-direction: column; }
+    .students-table { font-size: 11px; }
+    .students-table td, .students-table th { padding: 8px 5px; }
+    .students-table .rank { width: 28px; height: 28px; font-size: 11px; }
+    .action-btn { padding: 4px 7px; font-size: 10px; }
+    .modal-overlay { padding: 8px; }
+    .modal-header { padding: 18px 20px; }
+    .modal-header h2 { font-size: 16px; }
+    .modal-body { padding: 18px 16px; }
+    .modal-grade-row { grid-template-columns: 1fr; text-align: center; gap: 16px; }
+    .modal-circle { margin: 0 auto; }
+    .breakdown-grid-modal { grid-template-columns: 1fr; }
+    .qtable { font-size: 11px; }
+    .qtable th, .qtable td { padding: 6px 4px; }
+    .modal-actions { flex-direction: column; }
+    .modal-actions .btn { justify-content: center; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" class="login-bg">
+  <div class="login-card">
+    <div class="logo">⚙</div>
+    <h1>لوحة تحكم المدرس</h1>
+    <p class="subtitle">Advanced Deep Learning — AI4203</p>
+    <form id="login-form" onsubmit="return doLogin(event)">
+      <div class="form-group">
+        <label for="pwd">كلمة السر</label>
+        <input type="password" id="pwd" autocomplete="off" required>
+      </div>
+      <button type="submit" class="btn-login">دخول ←</button>
+      <div id="error-msg" class="error-msg">كلمة سر خاطئة</div>
+    </form>
+    <p style="margin-top: 24px; color: #94a3b8; font-size: 13px;">
+      <a href="index.html" style="color: #94a3b8; text-decoration: none;">
+        ← العودة لصفحة الطلبة
+      </a>
+    </p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="dashboard">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">AI</div>
+      <div class="brand-text">
+        <h1>لوحة تحكم المدرس</h1>
+        <p>Advanced Deep Learning — AI4203 — د. احمد الهندي</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-secondary">عرض صفحة الطلبة</a>
+      <button onclick="doLogout()" class="btn btn-danger">خروج</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="label">إجمالي الطلبة</div>
+        <div class="value" id="stat-count">0</div>
+        <div class="sub">المسجلون في المقرر</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">Group 1</div>
+        <div class="value" id="stat-g1">0</div>
+        <div class="sub">طالب في المجموعة الأولى</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="label">Group 2</div>
+        <div class="value" id="stat-g2">0</div>
+        <div class="sub">طالب في المجموعة الثانية</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="label">متوسط الدرجات</div>
+        <div class="value" id="stat-avg">0%</div>
+        <div class="sub" id="stat-avg-points">— / 30</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">أعلى درجة</div>
+        <div class="value" id="stat-max">0</div>
+        <div class="sub" id="stat-max-name">—</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">أدنى درجة</div>
+        <div class="value" id="stat-min">0</div>
+        <div class="sub" id="stat-min-name">—</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">عدد الناجحين</div>
+        <div class="value" id="stat-pass">0</div>
+        <div class="sub">≥ 60%</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">عدد الراسبين</div>
+        <div class="value" id="stat-fail">0</div>
+        <div class="sub">&lt; 60%</div>
+      </div>
+    </div>
+
+    <!-- Distribution chart -->
+    <div class="panel">
+      <div class="panel-header"><h2>توزيع التقديرات</h2></div>
+      <div class="panel-body">
+        <div class="dist-chart" id="dist-chart"></div>
+      </div>
+    </div>
+
+    <!-- Students table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>قائمة الطلبة وتقاريرهم</h2>
+        <span style="color:#94a3b8;font-size:13px;" id="filter-count">—</span>
+      </div>
+      <div class="panel-body">
+        <div class="search-box">
+          <input type="text" id="search" placeholder="بحث بالاسم أو الرقم الجامعي..." oninput="renderTable()">
+          <select id="filter-group" onchange="renderTable()">
+            <option value="">كل المجموعات</option>
+            <option value="Group 1" id="opt-g1">Group 1</option>
+            <option value="Group 2" id="opt-g2">Group 2</option>
+          </select>
+          <select id="filter-tier" onchange="renderTable()">
+            <option value="">كل التقديرات</option>
+            <option value="A+">A+</option>
+            <option value="A">A</option>
+            <option value="B+">B+</option>
+            <option value="B">B</option>
+            <option value="C+">C+</option>
+            <option value="C">C</option>
+            <option value="D+">D+</option>
+            <option value="D">D</option>
+            <option value="F">F</option>
+          </select>
+          <select id="sort-by" onchange="renderTable()">
+            <option value="rank">ترتيب: حسب الدرجة</option>
+            <option value="name">ترتيب: حسب الاسم</option>
+            <option value="uid">ترتيب: حسب الرقم</option>
+            <option value="group">ترتيب: حسب المجموعة</option>
+          </select>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>الترتيب</th>
+                <th>الاسم</th>
+                <th>الرقم الجامعي</th>
+                <th>المجموعة</th>
+                <th>الدرجة</th>
+                <th>%</th>
+                <th>التقدير</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Activity panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>📊 نشاط الدخول</h2>
+        <button id="refresh-activity" class="refresh-btn" onclick="loadActivity()">
+          <span id="refresh-icon">↻</span> تحديث البيانات
+        </button>
+      </div>
+      <div class="panel-body">
+        <div id="activity-content">
+          <div class="activity-loading">جارٍ تحميل بيانات الدخول...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">تفاصيل الطالب</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "AI4203";
+
+// === STUDENTS_DATA_INLINE_START ===
+const STUDENTS = {"443002036": {"sid": "443002036", "name": "تركي عبدالله محسن المرحم", "score": 24.5, "max": 30, "percent": 81.67, "tier": "B", "tier_color": "#1d4ed8", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 6.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Positional Encoding, Embedding, attention", "note": "Per marking_scheme: Encoder = 0, Decoder = 0, Attention = 1.0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "to give each word its position in the sentence", "note": "Per marking_scheme: position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q/Query, K/Key, V/Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attention is All you need. translating english to german and to france.", "note": "Title fully correct = 1.5. Translation concept with correct languages mentioned = 1.0 (precise term NMT missing, minor spelling issue). Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q/Query → decoder; K/Key → encoder; V/Value → encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "word classification, word similarity", "note": "Two acceptable uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Embedding give it meaning. Positional Encoding give it order and more information. They give each word its value for the right meaning and Place.", "note": "Word Embedding = 0.5 (very basic). Positional Encoding + reason = 0.5 (function stated, reason missing). Combination explanation = 1.0 (vague). Example = 0. Total: 2.0 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self Attention, embeddings, order a sentenc. Decoder-Only: masked attention, generat, generat a sentenc. Why ChatGPT is generative: generat the next token, Decoder only.", "note": "Attention type correct for both = 1.5. Goal (only Decoder side acceptable) = 0.5. Example tasks (weak / overlapping) = 0.5. Why ChatGPT generative = 1.5. Total: 4.0 / 5 (matches instructor's mark).", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "443009752": {"sid": "443009752", "name": "عبدالعزيز حسين أحمد أبوطالب", "score": 28.0, "max": 30, "percent": 93.33, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "Encoder, Decoder, Attention Mechanism", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "to inject the information of each token's position for word embedding", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query (Q), Key (K), Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "1- Attention is All You Need. 2- Machine translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query (Q): From the decoder's previous layer. Key (K) / Value (V): From the encoder's output.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Text classification, semantic search, Question Answering", "note": "Multiple correct uses (more than required) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding: Turns raw tokens into dense vectors. Positional encoding: Stores the token's position. Result: process the tokens while preserving its location for context.", "note": "Word Embedding = 1.0. Positional Encoding = 1.0. Combination explanation = 1.0. Additional clarification (result) = 0.5. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Bidirectional, Understands input, BERT. Decoder-Only: Previous token, Predict next token Auto Regressively, GPT. Why ChatGPT is generative: It's Decoder based But it uses previous context for Answers.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — listed models not tasks) + ChatGPT-generative (1.0) = 4.5 / 5.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444000742": {"sid": "444000742", "name": "خالد حسن سعيد الحربى", "score": 27.0, "max": 30, "percent": 90.0, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 0, "max": 2, "raw": "1- Tokenizer, 2- Transformer blocks, 3- LM Head", "note": "No correct items mentioned = 0 / 2.", "status": "خاطئة"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "Keep track of word order without it will be like a Bag of Words. It provides the model with information about the order of words in a sequence, so that the model can differentiate meaning based on word positions.", "note": "Position information + reason (implicit through BoW comparison) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q: Query, K: Key, V: Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attention Is All You Need. Model Translation.", "note": "Title fully correct = 1.5. Translation concept present but term imprecise ('Model' instead of 'Machine') = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query comes from decoder, Key and Value comes from encoder output", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Sentiment Analysis and Named Entity Recognition", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding convert it to tokens. Positional Encoding keep track of the word order. Each one is a vector, we sum them element-wise.", "note": "Word Embedding (with wording slip) = 0.5. Positional Encoding = 1.5. Combination (element-wise sum) = 1.0. Additional clarification (vector concept) = 0.5. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Natural Language Understanding (NLU), Sentiment Analysis + Named Entity Recognition. Decoder-Only: masked Self-Attention, Natural Language Generation (NLG), Code Generation + Storytelling. Why ChatGPT is generative: Because it was trained for Next Token Prediction.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444000774": {"sid": "444000774", "name": "يوسف صالح بن عبدالله كوشك", "score": 26.0, "max": 30, "percent": 86.67, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 4.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "encoder, decoder, attention", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "to determine the order of tokens", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query (Q), Key (K), Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 0, "max": 3, "raw": "the model was originally designed to generate new text", "note": "Title missing = 0. Task wrongly described (generic text generation instead of Machine Translation) = 0. Total: 0 / 3.", "status": "خاطئة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query comes from the previous layer of the decoder. Key and Value come from the final output of the encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "their embedding are excellent for classification work, sentiment analysis, Named entity recognition", "note": "Multiple correct uses (more than required) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "word embedding converts each word into numeric vector. positional encoding is added to these vectors to include other word's information. final output is a combined result that makes the transformer model.", "note": "Word Embedding = 1.0. Positional Encoding (slight imprecision) = 1.5. Combination = 1.0. Additional clarification = 0.5. Total: 4.0 / 4. Matches instructor's mark.", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: uses full self attention, understand entire sentence, sentiment analysis. Decoder-Only: uses masked attention, generate sentence step by step, chat bots. Why ChatGPT is generative: because it generates text one word at a time, using previous words only similar to masked attention.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444001669": {"sid": "444001669", "name": "معاذ محمد بن وازن السلمى", "score": 19.0, "max": 30, "percent": 63.33, "tier": "D", "tier_color": "#a16207", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 6.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 3.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- Encoder, 2- decoder, 3- Positional Encoding, Embedding", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "The primary function of Positional Encoding is not like the (RNN) reading one by one. The Positional Encoding injects information about order in transformers.", "note": "Position information + reason (parallel vs RNN sequential reading) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1-(Q): Query, 2-(K): Key, 3-(V): Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 0, "max": 2, "raw": "D", "note": "D selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "The title: 'Attention is all you need'. Task perform: machine translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 0, "max": 2, "raw": "Come from the input (Encoder) and move on to the decoder to generate an output.", "note": "Wrong answer (claimed all come from encoder) = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- NER, 2- text classification, 3- analyse", "note": "Multiple correct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Word Embedding normalize the input to help with finding relations among phrases/words, into dense numeric vector capture their semantic meaning.", "note": "Word Embedding partial = 1.0. Positional Encoding (not addressed properly) = 0.5. Combination explanation (missing) = 0. Additional clarification = 0.5. Total: 2.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 1.0, "max": 5, "raw": "Encoder-Only: The input values, To find out a relation between the words, To maximize the context. Decoder-Only: From the decoder, To generate an output containing the tokens from decoder, generate. Why ChatGPT is generative: because it's bidirectional, can understand both and generating new outcomes.", "note": "Attention (0 — both wrong) + Goal (0.5 — partial) + Examples (0 — too vague) + ChatGPT-generative (0.5 — wrong claim about bidirectional but recognized generative nature) = 1.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء مقبول. يُنصح بمراجعة المفاهيم الأساسية (Encoder/Decoder/Attention) والتدرب على الأسئلة المقالية."}, "444002747": {"sid": "444002747", "name": "محمد عبدالله بن علي ساعاتي", "score": 23.5, "max": 30, "percent": 78.33, "tier": "C+", "tier_color": "#0891b2", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 6.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Encoder, decoder, output layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "numbering words so the model knows the grammar and the words placement", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q (Query), K (Key), V (Value)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "'attintion is all you need'. machine translating.", "note": "Title correct (minor spelling) = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 0, "max": 2, "raw": "Encoder asks the Questions (Q), and decoder Provides Key and answers (K, V).", "note": "Sources inverted = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "text classification, Question answering", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.5, "max": 4, "raw": "Words Embedding = meaning. Positional Encoding = location. Combining meaning + location.", "note": "Word Embedding (label only) = 0.5. Positional Encoding (label only) = 1.0. Combination (mentioned only) = 1.0. Example (missing) = 0. Total: 2.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self-Attention, understand the whole sentence, Question answering. Decoder-Only: masked self-Attention, Know the Previous Word (Past) to Generate, chat-GPT. Why ChatGPT is generative: Because it use decoder-only.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — decoder side is a model) + ChatGPT-generative (0.5 — too brief) = 4.0 / 5.", "status": "جزئية"}], "notes": "أداء جيد. يحتاج إلى مزيد من التعمق في تفاصيل الـ Attention و Positional Encoding."}, "444002819": {"sid": "444002819", "name": "خالد محمد صويلح المقاطى", "score": 26.5, "max": 30, "percent": 88.33, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Word Embedding - Positional Encoding - Attention", "note": "Attention ✓ = 1.0. Encoder and Decoder missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "Positional Encoding take the meaning in consider and after the embedding take the vector and add to it a value and track word order.", "note": "Position information mentioned with mechanism = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query (Q), 2- Key (K), 3- Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Title: 'Attention is All You Need'. Task: Machine Translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Decoder: Q. Encoder: K and V.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 1.0, "max": 2, "raw": "1- Sentiment Classification, 2- Sentiment Analysis", "note": "One distinct correct use = 1.0; second answer is duplicate = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Embedding take the word and add value to it. Positional Encoding track the order of the meaning and word. After we do the Embedding and Positional Encoding we have vector so we sum them using element-wise.", "note": "Word Embedding = 1.0. Positional Encoding = 1.0. Combination explanation (element-wise sum) = 1.5. Example (missing) = 0. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Understand & Analysis, Sentiment Analysis / Sentence or Spam Emails classifier. Decoder-Only: mask Self-Attention, Generating, Generating an Email. Why ChatGPT is generative: GPT is considered as decoder model, so when we prompt a text the GPT generates a text based on our prompt and because of that we call it a generative model.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444003040": {"sid": "444003040", "name": "احمد سعيد بن محمد آل يزيد", "score": 24.5, "max": 30, "percent": 81.67, "tier": "B", "tier_color": "#1d4ed8", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 5.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "Decoder / Encoder / Attention mechanism", "note": "Decoder ✓ + Encoder ✓ + Attention mechanism ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 0.5, "max": 2, "raw": "Sequence Position", "note": "Position concept just mentioned (no explanation) = 0.5; reason missing = 0. Total: 0.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q: Query / K: Key / V: Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Title: Attention is All you need. Task: machine Translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q from decoder / K, V from encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "NER / classification", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 1.5, "max": 4, "raw": "Combined via addition, because the position changes the meaning.", "note": "Word Embedding (not defined) = 0. Positional Encoding (not defined) = 0.5. Combination (via addition, briefly) = 1.0. Brief reason = 0. Total: 1.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 3.5, "max": 5, "raw": "Encoder-Only: Attention All, Understand, NER. Decoder-Only: Self Attention, Generate, Question Answering. Why ChatGPT is generative: thinking of the next word.", "note": "Attention (0.5 — both imprecise/wrong) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (0.5 — too brief) = 3.5 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444003841": {"sid": "444003841", "name": "مصعب عبدالرشيد بن عمر اسكندر", "score": 25.0, "max": 30, "percent": 83.33, "tier": "B", "tier_color": "#1d4ed8", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.5, "max": 9}], "questions": [{"q": "Q1", "score": 0, "max": 2, "raw": "1- Tokenizer, 2- Transformer Blocks Stack, 3- Language Modeling Head", "note": "Encoder ✗ + Decoder ✗ + Attention ✗ = 0 / 2.", "status": "خاطئة"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "Since attention doesn't care about words' order and positions, transformers use Positional Encoding to track each word's (token) position.", "note": "Position information + reason (attention is order-agnostic) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query, 2- Key, 3- Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "'Attention is all you need' paper, designed to perform translation task.", "note": "Title fully correct = 1.5. Task ('translation task' — close but not the precise term 'Machine Translation') = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "While K and V come from encoder, Q comes from decoder.", "note": "K, V from encoder + Q from decoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 1.0, "max": 2, "raw": "1- RAG, 2- Text Classification", "note": "Text Classification ✓ = 1.0. RAG (not a pure Encoder-Only use) = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 3.0, "max": 4, "raw": "Word Embedding is the process of translating words (tokens) to vectors. Positional Encoding is the process of tracking each word's position. They're complementary processes — while the vectors of the Word Embedding capture the meaning of a single token, Positional Encoding add position and order information to capture the meaning of the full sentence.", "note": "Word Embedding (clear definition) = 1.0. Positional Encoding (clear definition + implicit reason) = 1.5. Combination (conceptual, mechanism not explicit) = 0.5. Example (missing) = 0. Total: 3.0 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self-attention, Represent and understand contextual relations, Text Classification. Decoder-Only: Masked self-attention, Predict the next token based on the previous ones, Question-Answering. Why ChatGPT is generative: It's decoder only model, so its task is to predict (generate) the next token.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.75 — QA slightly less canonical for decoder-only) + ChatGPT-generative (0.75 — clear but brief) = 4.5 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444004387": {"sid": "444004387", "name": "عبدالعزيز محمد بن عبيد بسيونى", "score": 20.0, "max": 30, "percent": 66.67, "tier": "D+", "tier_color": "#ca8a04", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 2.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 5.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "word embedding / transformer body (Encoder/decoder) / output Head", "note": "Encoder ✓ (within 'transformer body') + Decoder ✓ (within 'transformer body') + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "to save the position of the word", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 0, "max": 2, "raw": "The word we are looking at / Previous word / future word", "note": "Q ✗ + K ✗ + V ✗ = 0 / 2.", "status": "خاطئة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attenion All you Need / Tranclate machein", "note": "Title correct (with spelling errors) = 1.5. Task (Machine Translation — intended but spelling unclear) = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 1.5, "max": 2, "raw": "Q from the Decoder / K from the Encoder when you map the key / V is th Value", "note": "Q from decoder ✓ (1.0) + K from encoder ✓ (0.5) + V source not specified (0) = 1.5 / 2.", "status": "جزئية"}, {"q": "Q10", "score": 1.0, "max": 2, "raw": "Good at questions answer / Classification", "note": "Classification ✓ = 1.0. First answer (unclear phrasing) = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "we use Positional Encoding to know the position because unlike RNN word Embedding does not give value to the position and what comes first; it All have the same weight.", "note": "Word Embedding (not defined) = 0. Positional Encoding (well-explained with reason) = 1.5. Combination explanation (missing) = 0. Additional clarification = 0.5. Total: 2.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 3.0, "max": 5, "raw": "Encoder-Only: unmasked, save data, Questions answer. Decoder-Only: Masked self-attention, genrat data, gerat new word. Why ChatGPT is generative: It use Decoder only.", "note": "Attention (1.0 — unmasked partial + Masked self-attention ✓) + Goal (0.5 — encoder wrong + decoder partial) + Examples (1.0) + ChatGPT-generative (0.5 — too brief) = 3.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء مقبول. يُنصح بمراجعة المفاهيم الأساسية (Encoder/Decoder/Attention) والتدرب على الأسئلة المقالية."}, "444004469": {"sid": "444004469", "name": "عبدالله خالد بن مصطفى باخدلق", "score": 27.0, "max": 30, "percent": 90.0, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "1- Encoder, 2- decoder, 3- Attention", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "to provide information about the order of words in sequence", "note": "Position/order information clearly mentioned = 1.0; reason (parallel processing) implied but not explicit = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query (Q), 2- Key (K), 3- Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "All you Need / designed model machine translation", "note": "Title incomplete ('All you Need' — missing 'Attention is') = 1.0. Machine translation precisely named = 1.5. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q came from decoder / K and V came from encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Text classification / question and answer", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Word Embedding for understand meaning, Positional Encoding for order that words / because changing it change meaning.", "note": "Word Embedding (brief label) = 0.5. Positional Encoding (label + reason) = 1.0. Combination (not explained) = 0. Additional clarification = 0.5. Total: 2.0 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self Attention, understand meaning, Text classification. Decoder-Only: Mask self Attention, generation, generation Text. Why ChatGPT is generative: because I ask ChatGPT after that it give me answer, it has a lot of information and the Attention of ChatGPT is Mask self Attention.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444004489": {"sid": "444004489", "name": "يزيد يوسف مسلم اللقماني", "score": 28.0, "max": 30, "percent": 93.33, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- Encoder, 2- Decoder, 3- Output Layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "Positional Encoding tells the model the order of words", "note": "Position information clearly stated = 1.0; reason (parallel processing) implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is All you need / Translate Machine", "note": "Title fully correct = 1.5. Machine Translation correctly named (reversed word order is acceptable) = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q → come from the decoder / K and V → come from the encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "text classification / sentiment analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding gives each word meaning. Positional Encoding gives each word position. This is important because word order changes meaning. For example, 'dog bites man' / 'man bites dog'.", "note": "Word Embedding (clear definition) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination (conceptual) = 0.5. Concrete example (excellent) = 0.5. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: self attention, understanding the text, text classification. Decoder-Only: masked self attention, generating the text, generate the text. Why ChatGPT is generative: it creates text token by token. ChatGPT decoder only. Encoder-Only models are used for understanding text. They use self attention. Decoder-Only models are used for generating text. They use masked self attention.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444004939": {"sid": "444004939", "name": "مهند ابراهيم عبدالله سيام", "score": 26.0, "max": 30, "percent": 86.67, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.5, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "- Self-Attention / - Encoder/decoder / - Output", "note": "Self-Attention ✓ + Encoder/Decoder ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "It focuses on the 'Location' of the word instead of sequence using positional self-attention", "note": "Position information clearly stated = 1.0; reason (parallel processing) implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "- Query (Q) / - Key (K) / - Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.5, "max": 3, "raw": "'Attention is all you need' and it was used For classification", "note": "Title fully correct = 1.5. Task ('classification' is wrong, should be Machine Translation) = 0. Total: 1.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query comes from decoder, while Key and value come from encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 1.5, "max": 2, "raw": "- Text classification / - Inference", "note": "Text Classification ✓ = 1.0. Inference (too vague) = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word embeddings are the context or meaning of a specific word but not its context in a position. Positional Encoding has the word context relying on its location in the sentence. Combining both can give both meaning and positioning for context. However, scaling down is needed.", "note": "Word Embedding (clear definition) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination explanation = 1.0. Example (missing) = 0. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Predict previous and next word, BERT. Decoder-Only: Masked self-attention, Predict next word, GPT. Why ChatGPT is generative: because it uses decoder-only structure, only predicting what comes after.", "note": "Attention (1.5) + Goal (1.0 — encoder wrong + decoder correct) + Examples (0.5 — model names, not tasks) + ChatGPT-generative (1.0) = 4.0 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444004940": {"sid": "444004940", "name": "عبدالله وديع بن عبدالله بخارى", "score": 26.0, "max": 30, "percent": 86.67, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "- Embeddings / - Positional encoding / - attention", "note": "Encoder ✗ + Decoder ✗ + Attention ✓ = 0 + 0 + 1.0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "Help the model focus on Position of words. If we didn't use it, we have 'nick eat pizza' and 'pizza eat nick' the model will think it's the same.", "note": "Position information + reason (without it, word order is lost) + example = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "- Query / - Key / - Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "- Attention is all you need / - It was designed to perform translation tasks", "note": "Title fully correct = 1.5. Task ('translation tasks' — close but not the precise term 'Machine Translation') = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 0.5, "max": 2, "raw": "K, Q come from Encoder / V come from Decoder", "note": "K from encoder ✓ = 0.5. Q wrong (claimed from encoder) + V wrong (claimed from decoder) = 0. Total: 0.5 / 2.", "status": "جزئية"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Classification / Sentiment analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Small summary: WE → PE → Attention. Word Embedding used to make the words or tokens represented as numbers, for computer to understand. Positional Encoding used to know the position of the word because changing positions changes meaning. Positional Encoding comes after Word Embedding then passes to Attention head.", "note": "Word Embedding (clear definition) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination (flow well-explained) = 1.0. Example (missing) = 0. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self-attention, Context aware Embeddings, classification. Decoder-Only: masked Self-attention, generating responses, translate English to Arabic. Why ChatGPT is generative: because it's using masked self-attention to generate words, sentences, Docs.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.75 — encoder ✓ + decoder slightly off) + ChatGPT-generative (0.75) = 4.5 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444005062": {"sid": "444005062", "name": "زياد اسامه بن عبدالرزاق مياجان", "score": 22.5, "max": 30, "percent": 75.0, "tier": "C+", "tier_color": "#0891b2", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 6.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 3.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- Positional Encoding / 2- Embedded word / 3- Attention", "note": "Encoder ✗ + Decoder ✗ + Attention ✓ = 0 + 0 + 1.0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "Help the model focus on position in the word. In the past RNN doesn't have problem with the position but in the Transformer there was problem with that so they added [PE].", "note": "Position information + reason (parallel processing vs RNN sequential) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q / K / V", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 0, "max": 2, "raw": "C", "note": "C selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q8", "score": 1.5, "max": 3, "raw": "'the attention is all you need'", "note": "Title fully correct = 1.5. Task (not answered) = 0. Total: 1.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 0, "max": 2, "raw": "Q → Query] Encoder / K → Keys] Decoder / V → Value] Decoder", "note": "Sources completely inverted = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Classification / Sentiment Analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.0, "max": 4, "raw": "Word Embedding: transform the word to tokens. Positional Encoding: put the location for the word. Ex: dog bats man ≠ man bats dog. Same word but not same meaning.", "note": "Word Embedding (brief, slightly imprecise) = 0.5. Positional Encoding (brief definition) = 1.0. Combination (not explained) = 0.5. Concrete example (excellent) = 1.0. Total: 3.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self attention, to understand the meaning, human filling / Classification. Decoder-Only: Masked Self-Attention, to generate from the user prompt, Generate text, code. Why ChatGPT is generative: Because he is a decoder model.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء جيد. يحتاج إلى مزيد من التعمق في تفاصيل الـ Attention و Positional Encoding."}, "444005481": {"sid": "444005481", "name": "حازم عبدالله صالح المصعبي", "score": 28.0, "max": 30, "percent": 93.33, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 0, "max": 2, "raw": "- tokenazen / - transformer block / - Language model head", "note": "Encoder ✗ + Decoder ✗ + Attention ✗ = 0 / 2.", "status": "خاطئة"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "It's focus the order of the word in the sentence, to add it to the vector of the word, after that the vector will have more context.", "note": "Position information + reason/mechanism (add to vector for context) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "- Query matrix / - Key matrix / - Value matrix", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is All You need / the task is machin translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q come from Decoder, K, V come from Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "- Sentiment Analysis / - Classification", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word embedding turn word to vector of number. Positional Encoding add the order of the word in the sentence to vector to have context. Without Positional Encoding the sentence 'Dog have toy' and 'toy have Dog' will be the same for the model.", "note": "Word Embedding = 1.0. Positional Encoding (definition + reason) = 1.5. Combination explanation = 1.0. Concrete example = 0.5. Total: 4.0 / 4 (full marks). Matches instructor's mark.", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, have full awareness of the sentence, Classification. Decoder-Only: masked-Attention, make the model continue the sentence, generate next word. Why ChatGPT is generative: because it's a Decoder-only Transformer that gave it ability to generate next word (token) after the prompt to give us answer for our prompt.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444005612": {"sid": "444005612", "name": "صالح سليمان صالح ناقور", "score": 25.5, "max": 30, "percent": 85.0, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 6.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- word embedding / 2- Positional encoder / 3- attention", "note": "Encoder ✗ + Decoder ✗ + Attention ✓ = 0 + 0 + 1.0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "To keep track the word order", "note": "Position information clearly stated = 1.0; reason implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query / 2- Key / 3- Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 0, "max": 2, "raw": "A", "note": "A selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Title: Attention is all you need. Task: neural machine translation (NMT), specifically English-German translation, English-French translation.", "note": "Title fully correct = 1.5. NMT precisely named with specific language pairs = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Key (K) and Value (V) comes from output encoder. Query comes from decoder.", "note": "K, V from encoder + Q from decoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- sentiment classification / 2- named entity recognition", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word embedding convert words to numbers because transformer is neural network and NN takes only numbers as input but the problem is word embedding ignore word order, so we need positional encoding to track word order. Order is important for example (man eat apple) and (apple eat man) same words but different order.", "note": "Word Embedding (clear + reason) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination (implied, mechanism not explicit) = 0.5. Concrete example = 0.5. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self attention, looks at current word to understand text fully, Sentiment classification. Decoder-Only: Masked attention, Looks to the past to predict the next word, generative like ChatGPT. Why ChatGPT is generative: because it relies on decoder Transformer to predict and generate word by word.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.75 — decoder example is a model reference) + ChatGPT-generative (0.75 — clear) = 4.5 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444006228": {"sid": "444006228", "name": "وليد حسين ابن علي خياط", "score": 27.0, "max": 30, "percent": 90.0, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Tokenizer / Encoder / Decoder", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "To provide the transformer with the order of the words or position in the sequence", "note": "Position/order information clearly stated = 1.0; reason (parallel processing) implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q, K, V / Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.5, "max": 3, "raw": "Attention is All you need / classification", "note": "Title fully correct = 1.5. Task (classification — wrong, should be Machine Translation) = 0. Total: 1.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q comes from Decoder / K and V from Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Sentiment Analysis / Named Entity Recognition / Text Classification", "note": "Multiple correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word Embedding gives you the meaning of the words. Positional Encoding tells you the place of the word or the order of the words in the sequence. They are combined so that the model can understand and know the order of the words because otherwise it processes it all at the same time without knowing the order or the meaning of it. It could say 'the man bit the dog' instead of 'the dog bit the man'.", "note": "Word Embedding = 1.0. Positional Encoding (definition + reason) = 1.5. Combination explanation (excellent) = 1.0. Concrete example = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-attention, to get the context aware embeddings, Sentiment Analysis / Named Entity Recognition. Decoder-Only: Masked self-attention, to generate the next word, Generative models (ChatGPT). Why ChatGPT is generative: because it uses decoder-only model to generate the next word based on the previous words without knowing the next words.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444006357": {"sid": "444006357", "name": "بكري طارق معتوق عساس", "score": 11.5, "max": 30, "percent": 38.33, "tier": "F", "tier_color": "#dc2626", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 3.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 6.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 2.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Embedding / Encoder-decoder / Activation function", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 0.5, "max": 2, "raw": "The primary function of positional encoding is positioning the encoder in the position where it would function best within a transformer.", "note": "Position information not clearly stated (confused with 'positioning the encoder') = 0.5; reason missing = 0. Total: 0.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q, K, V", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 0, "max": 2, "raw": "C", "note": "C selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 0, "max": 3, "raw": "The title represented a new era in deep learning as transformers revolutionized the industry and it was designed to make models more efficient and accurate.", "note": "Title not given = 0. Task not given = 0. Total: 0 / 3.", "status": "خاطئة"}, {"q": "Q9", "score": 0, "max": 2, "raw": "Query, Key, Value / Q, K, V", "note": "Sources of Q, K, V not specified = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 0, "max": 2, "raw": "Context Aware Embeddings are used mainly when we need the context to be put into consideration and when the disregard of it would result in inaccurate results.", "note": "No practical uses named = 0 / 2.", "status": "خاطئة"}, {"q": "Q11", "score": 0.5, "max": 4, "raw": "Word Embedding and Positional Encoding are two of the main parts that make a transformer as we need them before applying the transformer. It makes it better encoded and embedded before it becomes a proper input as transformers would function better after...", "note": "Word Embedding (not defined) = 0. Positional Encoding (not defined) = 0. Combination (not explained) = 0. Generic effort = 0.5. Total: 0.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 1.5, "max": 5, "raw": "Encoder-Only: Masked self attention, disregard irrelevant info, Giving the weather forecast. Decoder-Only: Self attention, using more computational power to give answers, Analyzing a BP monitor. Why ChatGPT is generative: ChatGPT is a generative tool because it doesn't have ready-made responses, it can only respond after a given prompt by generating a response which can be in text, audio, or even visual as in picture/video.", "note": "Attention (0 — both swapped) + Goal (0 — imprecise) + Examples (0.5 — non-canonical) + ChatGPT-generative (1.0 — good) = 1.5 / 5.", "status": "جزئية"}], "notes": "أداء ضعيف يتطلب مراجعة شاملة للمقرر."}, "444006413": {"sid": "444006413", "name": "يوسف حيدر بن حسن شيخ جمل الليل", "score": 29.0, "max": 30, "percent": 96.67, "tier": "A+", "tier_color": "#16a34a", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.5, "max": 2, "raw": "Conceptually the main parts: word embeddings, positional encoding, attention. But in a pipeline oriented way it is: tokenizer, transformer blocks, language head.", "note": "Attention ✓ + Encoder/Decoder (implicit via 'transformer blocks') = 1.5 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "Preserving word order, so the model learns context.", "note": "Position information clearly stated = 1.0; reason (parallel processing) implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "attention is All you need. The main task was machine translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "The query from the decoder, while key and value from the encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "sentiment analysis and retrieval", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word Embeddings are dense vectors that represent unstructured text in a mathematical way and it preserves semantical similarity, but a problem with it is that it can't preserve word order. The solution was positional encoding by adding to the embeddings a sinusoidal function that preserves word order. Input = WE + Pi.", "note": "Word Embedding (precise definition) = 1.0. Positional Encoding (definition + reason + sinusoidal detail) = 1.5. Combination (explicit formula WE + Pi) = 1.0. Mathematical formulation = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self Attention, Attends to all words in a sentence (past, future), sentiment analysis, document similarity. Decoder-Only: Masked-self Attention, Attends to only the previous words and blocking future words, Question Answering, Next token prediction. Why ChatGPT is generative: because it was trained in an Auto-regressive way to generate tokens given a prompt (previous text). This was possible by using Masked self Attention.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444006691": {"sid": "444006691", "name": "فارس طلال بن سعود العصيمي", "score": 26.0, "max": 30, "percent": 86.67, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "attention / word embedding / Positional encoding", "note": "Encoder ✗ + Decoder ✗ + Attention ✓ = 0 + 0 + 1.0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "It uses to give position for order", "note": "Position information mentioned = 1.0; reason missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query / Key / Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is All You Need / machine translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "K, V from Encoder / Q from Decoder", "note": "K, V from encoder + Q from decoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "text classification / NER", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Word Embedding uses to give vector that represent the meaning. Positional Encoding uses to give every word vector that represent the order.", "note": "Word Embedding (definition) = 1.0. Positional Encoding (definition, reason missing) = 1.0. Combination (not explained) = 0. Example (missing) = 0. Total: 2.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: bidirectional, to understand the text context, NER. Decoder-Only: masked, to generate the text, generate text. Why ChatGPT is generative: because it generates the text step-by-step and uses Decoder.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444006953": {"sid": "444006953", "name": "ماجد خالد بن باشه الفهمي", "score": 28.0, "max": 30, "percent": 93.33, "tier": "A", "tier_color": "#15803d", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "1- Encoder / 2- Decoder / 3- Attention Mechanism", "note": "Encoder ✓ + Decoder ✓ + Attention Mechanism ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "1- To provide the model with information in relative position or order in sequence. 2- To keep track of word order.", "note": "Position information clearly stated = 1.0; reason (parallel processing) implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Queries / 2- Keys / 3- Values", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "'Attention all you need'. Neural Translation. English to German, English to French.", "note": "Title (missing 'is') = 1.0. Neural Machine Translation precisely named with language pairs = 1.5. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Queries come from Decoder / Keys and values come from Encoder output", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- Sentiment classification / 2- Named Entity Recognition (NER)", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.0, "max": 4, "raw": "Word Embedding summed with Positional Encoding because Transformers [are] Parallel. Example: 'the dog bit man' vs 'the man bit dog'.", "note": "Word Embedding (not defined) = 0.5. Positional Encoding (with parallel reason) = 1.0. Combination explanation (summed) = 1.0. Concrete example = 0.5. Total: 3.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self attention, Understanding Context, sentiment Analysis. Decoder-Only: Mask Attention, Generate new word, Text completion. Why ChatGPT is generative: Because Decoder only and predict new token.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444007002": {"sid": "444007002", "name": "ريان عبدالله مبارك العوفي", "score": 28.5, "max": 30, "percent": 95.0, "tier": "A+", "tier_color": "#16a34a", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "Transformers consist of Encoder and decoder blocks. It uses: 1- word embedding, 2- Positional encoding, 3- attention", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "It tells the model the exact order and Position of the words.", "note": "Position information clearly stated = 1.0; reason implied = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query (Q), Key (K), and Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "'Attention is all You need'. The model was originally designed for: neural machine translation (NMT).", "note": "Title fully correct = 1.5. NMT precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Queries (Q) come from decoder / Keys (K) and Values (V) come from encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- Text classification / 2- Sentiment analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word embedding gives the word its meaning. Word embedding converts the word into numbers because transformers is NN and NN can only use numbers as input. But the problem is word embedding ignores the order, so because of that we need Positional encoding to track the order because the order is so important. 'dog bites man' not 'man bites dog'.", "note": "Word Embedding (clear definition + reason) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination (implied) = 0.5. Concrete example = 0.5. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self attention, to look at the whole text so allows every word to attend to all other words, Sentiment analysis. Decoder-Only: Masked self-attention, to look at only past text to generate new words, Neural machine translation (NMT). Why ChatGPT is generative: because it uses decoder architecture so to predict the next word by the previous words word-by-word and then generate new words. And also use encoder for text classification for example so GPT combined it together.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.75 — NMT slightly off for decoder-only) + ChatGPT-generative (0.75 — detailed but minor inaccuracy at end) = 4.5 / 5.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444007018": {"sid": "444007018", "name": "عزام حسن بن محسن السلمي", "score": 25.5, "max": 30, "percent": 85.0, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.5, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "1- Encoder / 2- Decoder / 3- Self-attention block", "note": "Encoder ✓ + Decoder ✓ + Self-Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.5, "max": 2, "raw": "To add unique value to order of token, so we can extract different meaning of same word if its Position different.", "note": "Position information + consequence well-explained = 1.5; explicit parallel-processing reason missing = 0.5 short. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query (Q): The term that is asking which terms are most relevant. Key (K): A label used to index and match words in attention score table. Value (V): The stored information retrieves as a result of attention processes.", "note": "All three correct with detailed definitions = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.0, "max": 3, "raw": "Paper name is 'Attention is you need', and the architecture has several tasks like Text Generation by decoder, Sentiment Analysis, Named Entity Recognition (NER), Natural Language Understanding (NLU).", "note": "Title incomplete = 1.0. Original task (Machine Translation) not given = 0. Total: 1.0 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q come from masked attention in decoder block, but K and V come from final hidden state of Encoder block. These values enter to multi-head attention in decoder and the process name is Cross attention.", "note": "Q from decoder + K, V from encoder + Cross Attention naming = 2.0 (full marks with bonus understanding).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- Sentiment Analysis / 2- Named Entity Recognition (NER)", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding is a word vector that gives meaning to word numerically, and Positional Encoding gives to the word meaning depend on their positional or order. After we calculate the values of embedding and Positional Encoding we add them together before attention calculation.", "note": "Word Embedding (clear definition) = 1.0. Positional Encoding (definition + reason) = 1.5. Combination (explicit add before attention) = 1.0. Example (missing) = 0. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 3.5, "max": 5, "raw": "Encoder-Only: Multi head attention, calculation attention score, document classification. Decoder-Only: masked attention, Restricts each word to attend only to previous, Text Generation. Why ChatGPT is generative: Because it has a decoder architecture that has a masked attention.", "note": "Attention (1.0 — Multi-Head partial + Masked ✓) + Goal (0.5 — both flagged as mechanism not goal) + Examples (1.0) + ChatGPT-generative (1.0) = 3.5 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444010906": {"sid": "444010906", "name": "نواف جميل بن عايد الخطابي", "score": 24.0, "max": 30, "percent": 80.0, "tier": "B", "tier_color": "#1d4ed8", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 6.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Encoder - decoder - output layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "To give each word its position in the sequence", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query (Q), Key (K), Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.5, "max": 3, "raw": "Mentioned is All you need / Machine translation", "note": "Title incorrect ('Mentioned' instead of 'Attention') = 0. Machine Translation correctly named = 1.5. Total: 1.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query (Q) → Decoder / Key (K), Value (V) → Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "'text classification' and 'sentiment analysis'", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.5, "max": 4, "raw": "(Embedding gives meaning) + (Position gives order). Order is important for understanding sequences.", "note": "Word Embedding (brief label) = 0.5. Positional Encoding (label + brief reason) = 1.0. Combination (implicit via +) = 1.0. Example (missing) = 0. Total: 2.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self-Attention, understanding, bidirectional. Decoder-Only: Masked self-Attention, generate, masked / chatbot. Why ChatGPT is generative: Because ChatGPT generates text → generation model.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — properties/models instead of tasks) + ChatGPT-generative (0.5) = 4.0 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444011423": {"sid": "444011423", "name": "أحمد عبدالله بن باني الحربي", "score": 25.5, "max": 30, "percent": 85.0, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- Encoder / 2- Decoder / 3- Output layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "To give information about word order", "note": "Position information mentioned = 1.0; reason missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query (Q) / 2- Key (K) / 3- Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attention is all you need / model machine translate", "note": "Title fully correct = 1.5. Machine Translation (awkward wording) = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query come from Decoder / Key and value come from Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Text classification / sentiment analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Embedding convert word into vector. Positional Encoding adds order information word important because meaning changes.", "note": "Word Embedding (brief definition) = 1.0. Positional Encoding (brief + reason) = 1.0. Combination (not explicit) = 0. Example (missing) = 0. Total: 2.0 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self attention, understanding task, Text classification. Decoder-Only: Masked self attention, generation, Text generation. Why ChatGPT is generative: ChatGPT is generative and only Decoder because predict next token.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444015179": {"sid": "444015179", "name": "عبدالقادر مصطفى بن عبدالقادر لبان", "score": 24.0, "max": 30, "percent": 80.0, "tier": "B", "tier_color": "#1d4ed8", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 6.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 5.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "Encoder / Decoder / Attention mechanism", "note": "Encoder ✓ + Decoder ✓ + Attention mechanism ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "To give word order or fix. Example: 'Ahmed eats apple' ≠ 'Apple eats Ahmed'", "note": "Position information + reason illustrated via example = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q (Query), K (Key), V (Values)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "'Attention is All You Need' for machine translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 0, "max": 2, "raw": "Q from encoder / K, V from decoder", "note": "Sources completely inverted = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "text classifications / sentiment analysis", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Positional Encoding is used to give or fix word order. Word embedding is to make sure some words are joined together and not separated. They work together to make sure all words have meaning and are projected in the right order.", "note": "Word Embedding (incorrect characterization) = 0.5. Positional Encoding (brief definition + reason) = 1.0. Combination (conceptual, mechanism missing) = 0.5. Example (missing here) = 0. Total: 2.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 3.0, "max": 5, "raw": "Encoder-Only: Self Attention, embedding words, context aware embedding for text classification. Decoder-Only: Masked self attention, Generate text, ChatGPT. Why ChatGPT is generative: Because it's a generative model that generates text thanks to its masked self attention.", "note": "Attention (1.5) + Goal (1.0 — encoder imprecise + decoder ✓) + Examples (0.5 — encoder ✓ + decoder is a model) + ChatGPT (0.0... wait, let me recompute) = 3.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444015439": {"sid": "444015439", "name": "احمد عيدروس احمد العطاس", "score": 25.5, "max": 30, "percent": 85.0, "tier": "B+", "tier_color": "#2563eb", "group": "Group 1", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 5.5, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "Encoder / Decoder / Attention", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "It encode the position of words", "note": "Position information mentioned = 1.0; reason missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query / Key / Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention Is All You Need / designed for machine translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query comes from the output of the previous Decoder / Key and Value come from the final output of the Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "text classification / sentiment analyses", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 1.5, "max": 4, "raw": "Word Embedding is all word come from the data while Position Encoding is locate the position of all words", "note": "Word Embedding (imprecise) = 0.5. Positional Encoding (brief definition) = 1.0. Combination (not explained) = 0. Example (missing) = 0. Total: 1.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Encode the words / Context understanding, text classification. Decoder-Only: Masked Self Attention, Generate the words come from Encoder, Generate images. Why ChatGPT is generative: It can generate images, text, and videos.", "note": "Attention (1.5) + Goal (1.0 — encoder mixed + decoder partial) + Examples (0.75 — both acceptable) + ChatGPT-generative (0.75 — multi-modal generation) = 4.0 / 5.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "443003861": {"sid": "443003861", "name": "أنس إبراهيم عبدالله المولد", "score": 27, "max": 30, "percent": 90, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Word embedding, Positional encoding, Attention", "note": "Per marking_scheme: Encoder = 0, Decoder = 0, Attention = 1.0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "it tracks the word order", "note": "Per marking_scheme: position/order information mentioned = 1.0; reason missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attention is All you need. Text translation from German > English and French to English.", "note": "Title fully correct = 1.5. Translation concept mentioned but without the precise term and with reversed direction = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query came from decoder. Key and Value come from encoder output.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Sentiment Classification, Named Entity Recognition (NER).", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word embedding is convert word to numbers. Positional encoding track word order. We combine them together as input.", "note": "Word Embedding = 1.0 (basic). Positional Encoding + reason = 1.0 (function stated but reason missing). Combination explanation = 1.5. Example = 0. Total: 3.5 / 4.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Understanding context, Sentiment Classification. Decoder-Only: Masked Self-Attention, Generate new word, Question Answering. Why ChatGPT is generative: because it uses decoder-only Architecture and generates next word or token.", "note": "Attention (1.5) + Goal (1.5) + Example tasks (1.0) + ChatGPT-generative explanation (1.0) = 5.0 (full marks).", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "443004498": {"sid": "443004498", "name": "سلطان مسعود سعد العقيلي", "score": 29.5, "max": 30, "percent": 98.33, "tier": "A+", "tier_color": "#16a34a", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 6.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "We have: Embedding and Positional, encoder and Attention (includes FC). It's also consist of: Embedding and Pos and encoder and decoder.", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "To add the position of the current token or word embedding. Because the Transformer goes in parallel, not sequential, it has no sense of order. So we add positional encoding because the order affects the meaning and grammar.", "note": "Position information + reason (parallel processing / no inherent order) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query: what's the word looking for from others. Key: what's the word has and can give. Value: what's the value of a word.", "note": "All three correct with descriptions = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B (with the formula Softmax(QK^T/√d_k)V written alongside)", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B (option A was struck through)", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "'Attention is All you need'. It was for machine translation between English → Spanish or French.", "note": "Title fully correct = 1.5. Machine Translation correctly named with one wrong language (Spanish instead of German) = 1.0. Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Query: comes from the decoder. Key, Value: come from the encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Sentiment Analysis: for example happy or sad sentence. Named Entity Recognition: for example Noun.", "note": "Two correct uses with examples = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word Embedding: it's a trained Neural Network that assigns each token to a semantic vector. For example, in that vector 'King - Man + Women = Queen'. But in transformer it has no sense of position. Positional Encoding: Because word embedding has no sense of order and because order so matters, we add Sin/Cos waves to the word [embedding to encode the order].", "note": "Word Embedding definition = 1.0. Positional Encoding + reason = 1.5. Combination (addition of sin/cos to embedding) = 1.0. Concrete example (King-Man+Woman=Queen) = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, Understand the text and produce context-aware, Sentiment Analysis OR BERT. Decoder-Only: Masked Attention, Next token Prediction, Gemini or GPT for writing a story. Why ChatGPT is generative: Because it's a Decoder-only model that generates token by token and only depends on the current and previous tokens.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative explanation (1.0) = 5.0 (full marks). Matches the instructor's mark of 5.", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "443004640": {"sid": "443004640", "name": "ياسر عبدالعزيز سمران الحربي", "score": 28.5, "max": 30, "percent": 95.0, "tier": "A+", "tier_color": "#16a34a", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- input embeddings with Positional encoding, 2- encoder, 3- decoder", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "To keep track of word order, since transformer process tokens in parallel.", "note": "Position information + reason (parallel processing) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query (Q), 2- Key (K), 3- Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Paper title: 'Attention Is All You Need'. The paper's task was machine translation, for example: English → German, English → French. It was proposed with the transformer idea.", "note": "Title fully correct = 1.5. Machine Translation with both correct languages = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "The Q comes from masked self-attention in the decoder while K, V comes from self-attention in the encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "For encoder-only model, its Context Aware Embeddings can be used for many practical tasks, like: 1- Sentiment Analysis, 2- Named Entity Recognition (NER), and many more.", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word Embeddings and Positional Encoding are essential in Transformer models, each one has its own job to do. Starting with word embeddings: it converts the tokens into vector of numbers representing each token. It is important since NN works with numbers. Moving to Positional Encoding, after converting tokens into vectors, now we process the word order, since transformer process tokens in parallel.", "note": "Word Embedding definition = 1.0. Positional Encoding + reason = 1.5. Combination explanation = 1.0. Additional clarification (NN works with numbers) = 0.5. Total: 4.0 / 4 (full marks). Matches instructor's mark of 4.", "status": "صحيحة"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self-Attention, To Produce Context-Aware embeddings, Sentiment Analysis, NER, QA, etc. Decoder-Only: Masked Self-Attention, To Predict the next token given previous tokens, ChatGPT, Gemini, Claude, etc. Why ChatGPT is generative: Because ChatGPT is a decoder-only model, which means it predicts the next token from previous tokens.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — encoder side correct as tasks; decoder side listed as models not tasks) + ChatGPT-generative (1.0) = 4.5 / 5. Matches instructor's mark of 4.5.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "443004875": {"sid": "443004875", "name": "عبدالرحمن عون عبدالله الغامدي", "score": 27.5, "max": 30, "percent": 91.67, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "-Attention, -Embeddings, -Positional encoding", "note": "Attention ✓ = 1.0. Encoder and Decoder missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "Helps us to keep track of words order in a sentence.", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q → Queries, K → Keys, V → Values", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is all you need. Machine translation, specifically from English to German.", "note": "Title fully correct = 1.5. Machine Translation with correct direction = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "The decoder uses the outputs from the encoder to calculate K, V. Then the Q are then calculated using Masked Self-attention, in the decoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "In classification tasks. Clustering similar documents.", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Positional Encoding: an index for each word we have that helps us track word order. Word Embedding: a representation of text that allows the Neural network to process text. First text is transformed into encoded tokens of Embedding and then the PE is added to it, where the index is added to the embedding vector forming the input to transformers.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.5. Combination explanation = 1.0. Clarification = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Self-Attention (looks at after and before words of interest), Build a deep contextual understanding of words, Fully context-aware embeddings used in classification tasks. Decoder-Only: Masked Self-attention (each word attend to itself and previous tokens only), Generate text step by step, Auto regressive models used for content generation. Why ChatGPT is generative: Because it is a decoder-only transformer that generates text step by step.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — somewhat abstract/imprecise on decoder side) + ChatGPT-generative (1.0) = 4.5 / 5. Matches instructor's mark of 4.5.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "443006819": {"sid": "443006819", "name": "نواف نجم الدين عبدالغفور الأنديجاني", "score": 20.0, "max": 30, "percent": 66.67, "tier": "D+", "tier_color": "#ca8a04", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 6.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 2.5, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 6.5, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "1- Encoder, 2- Decoder, 3- Attention mechanism", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "To provide context and position in the sentence.", "note": "Position information mentioned = 1.0; reason (parallel processing) missing; extra 'context' is misleading but not penalized. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query (Q), 2- Key (K), 3- Value (V)", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 0, "max": 2, "raw": "C", "note": "C selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.5, "max": 3, "raw": "Attention is All you need", "note": "Title fully correct = 1.5. Task (Machine Translation) not mentioned = 0. Total: 1.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 0, "max": 2, "raw": "They come from the self Attention mechanism", "note": "Wrong answer (described self-attention instead of encoder-decoder attention) = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 1.0, "max": 2, "raw": "1- sentiment Analysis, 2- semantic meaning", "note": "One correct use (sentiment analysis) = 1.0; 'semantic meaning' is too vague to count as a practical task = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 2.0, "max": 4, "raw": "Word embeddings use Encoder and Decoder to understand the meaning of the word and use them. And the Positional Encoding provides context and position for the word so it becomes a sorted and understandable sentence.", "note": "Partial credit for naming both concepts and attempting the explanation, but with conceptual errors and missing combination mechanism = 2.0 / 4. Matches instructor's mark of 2.", "status": "جزئية"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: Uses self-attention, sees the whole sentence; Encode words, take words and sentence to understand it; Sentiment Analysis. Decoder-Only: Uses masked self-attention, only sees the previous word; Take the encoded words and use them to form sentence; LLMs like ChatGPT. Why ChatGPT is generative: ChatGPT is considered a decoder-only LLM. It's considered generative because it sees the word before to generate the next sentence.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — decoder side gave model not task) + ChatGPT-generative (1.0) = 4.5 / 5. Matches instructor's mark of 4.5.", "status": "جزئية"}], "notes": "أداء مقبول. يُنصح بمراجعة المفاهيم الأساسية (Encoder/Decoder/Attention) والتدرب على الأسئلة المقالية."}, "444000615": {"sid": "444000615", "name": "نايف متعب بن عبدربه الحربي", "score": 26.5, "max": 30, "percent": 88.33, "tier": "B+", "tier_color": "#2563eb", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Encoder, Decoder, output layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "To get tokens order", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "query, key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is All you need. Machine Translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q from Decoder. K and V from Encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "classification, NER (Named Entity Recognition)", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 2.5, "max": 4, "raw": "Word Embedding = Meaning. Positional Encoding = ordering. Both together can capture meaning + order. 'Dog bites Man' vs 'Man bites dog' — so the order + meaning is important.", "note": "Word Embedding (very brief) = 0.5. Positional Encoding (brief, no reason) = 0.5. Combination implied via example = 0.5. Concrete example (Dog/Man) = 1.0. Total: 2.5 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Bidirectional, Understanding, NER. Decoder-Only: Masked, generation, Text generation. Why ChatGPT is generative: It's Decoder-Only. And it can predict next token.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark of 5.", "status": "صحيحة"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444001141": {"sid": "444001141", "name": "محمود عبدالله بن محمود قطان", "score": 18.0, "max": 30, "percent": 60.0, "tier": "D", "tier_color": "#a16207", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 2.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 4.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 4.0, "max": 9}], "questions": [{"q": "Q1", "score": 0, "max": 2, "raw": "1- Tokenizer, 2- Transformer blocks, 3- Unbedding layer", "note": "No correct items mentioned = 0 / 2.", "status": "خاطئة"}, {"q": "Q2", "score": 0, "max": 2, "raw": "SoftMax", "note": "Wrong concept entirely (SoftMax has no role in Positional Encoding) = 0 / 2.", "status": "خاطئة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- Query, 2- Key, 3- Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 1.0, "max": 3, "raw": "atinshen is all you needg", "note": "Title attempted with poor spelling = 1.0 (partial credit). Original task (Machine Translation) not mentioned = 0. Total: 1.0 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q = Decoder. K, V = Encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 1.0, "max": 2, "raw": "classification", "note": "One correct use = 1.0. Second use missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 0, "max": 4, "raw": "(blank — no answer given)", "note": "No answer = 0 / 4.", "status": "خاطئة"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self attention, (blank for goal), Classification. Decoder-Only: Masked Self attention, Generate new word, ChatGPT. Why ChatGPT is generative: because it use Decoder-Only to generate new words.", "note": "Attention (1.5) + Goal (0.75 — only decoder side answered) + Examples (0.75 — encoder correct, decoder gave model) + ChatGPT-generative (1.0) = 4.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء مقبول. يُنصح بمراجعة المفاهيم الأساسية (Encoder/Decoder/Attention) والتدرب على الأسئلة المقالية."}, "444001309": {"sid": "444001309", "name": "محمد احمد بن سعيد المفرجى", "score": 27.5, "max": 30, "percent": 91.67, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "output layer, encoder, decoder", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 2.0, "max": 2, "raw": "to keep track of word order, because the transformer process token in parallel and doesn't know.", "note": "Position information + reason (parallel processing) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is all you need. machine translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q for decoder. K, V for encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Sentiment Analysis, text classification, Q/A", "note": "Multiple correct uses (more than required) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding change each token to vector. Positional Encoding is added to that vector so Neural network can work. This is important because changing order can change meaning for example 'Mohammed eat pasta' vs 'Pasta eat Mohammed'. This is different.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.0 (function clear, reason partially implied). Combination explanation = 1.0. Concrete example = 0.5. Total: 3.5 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: Self Attention, Understanding text, Text classification. Decoder-Only: mask self attention, Generate one by one token, Sentiment Analysis. Why ChatGPT is generative: It keep predicting next token based on previous ones.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — encoder side correct, decoder side wrong) + ChatGPT-generative (0.5 — link to decoder-only architecture not explicit) = 4.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444002984": {"sid": "444002984", "name": "احمد دلدار بن محمد عارف", "score": 28.0, "max": 30, "percent": 93.33, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 9.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "encoder stack, decoder stack, and the attention mechanism", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "it accounts for the order of the tokens in a sequence", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "query, key, value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 2.0, "max": 3, "raw": "attention is all you need. The paper introduced a lot of details like types of attention and architectures and their uses like document understanding and next token prediction.", "note": "Title fully correct = 1.5. Task not directly stated (Machine Translation missing); described general uses = 0.5 partial. Total: 2.0 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "query comes from decoder, and keys and values come from encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "document understanding mainly. 1- NER (Named Entity Recognition), 2- token classification, 3- sentiment analysis", "note": "Multiple correct uses (more than required) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word embedding holds the semantic (meaning) of the word, while Positional encoding is an operation that accounts for the order of the words which add up to the word embedding to make it context-aware holding meaning and order in the same time.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.5. Combination explanation (addition) = 1.0. Additional clarification (context-aware result) = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: self attention and multi-head attention, understanding and representation of text, Named Entity Recognition. Decoder-Only: self and multi-head and masked attention, Predict next token, text generation. Why ChatGPT is generative: GPT stands for Generative Pre-trained Transformer and generative models architecture are decoder-only.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444003044": {"sid": "444003044", "name": "اياد عامر احمد العاطفى", "score": 26.0, "max": 30, "percent": 86.67, "tier": "B+", "tier_color": "#2563eb", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 5.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 5.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.0, "max": 9}], "questions": [{"q": "Q1", "score": 2.0, "max": 2, "raw": "1- input embeddings + Positional encoding, 2- encoding (attention layer), 3- decoding (FFN)", "note": "Encoder ✓ + Decoder ✓ + Attention ✓ (mentioned as a layer) = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "to add to the encoder the position of the word (it's order)", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- query, 2- key, 3- value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "'attention is all you need'. and it was for machine translation.", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 0, "max": 2, "raw": "the Query and Key comes from Encoder and the Value from Decoder.", "note": "Wrong answer (sources inverted) = 0 / 2.", "status": "خاطئة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "when you want meaning in the task. 1- sentiment classification, 2- Named Entity Recognition", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "the word embedding only encode the words into numerical form without it's order. the positional tell where the word was to respect the position so the meaning will change. and combined to make the representation meaningful with respect to the order in the sentence.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.5. Combination explanation = 1.0. Additional clarification = 0.5. Total: 4.0 / 4 (full marks).", "status": "صحيحة"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: bi-directional self-attention, to represent the input in numerical form, BERT to encode some words. Decoder-Only: masked self-attention, to generate from the encoder, BART to generate from decoder. Why ChatGPT is generative: because it's generate and predict the next token.", "note": "Attention (1.5) + Goal (1.0 — decoder side imprecise) + Examples (0.5 — listed models not tasks, and BART is encoder-decoder) + ChatGPT-generative (1.0) = 4.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء جيد جداً. هناك تحسن طفيف ممكن في الإجابات المقالية (Q11-Q12)."}, "444003779": {"sid": "444003779", "name": "محمد عبدالمنعم بن جائد الحجيلي", "score": 27.5, "max": 30, "percent": 91.67, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "Encoder - decoder - output Layer", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "It's Provide order and meaning to the Tokenizer", "note": "Position information mentioned = 1.0; reason missing and additional inaccuracies (meaning, tokenizer) = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Q - K - V", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is all You Need - Machine Translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q → Decoder; K, V → Encoder", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "Text classification, Question Answering", "note": "Two correct and distinct uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 3.5, "max": 4, "raw": "Word Embedding gives meaning, Positional Encoding adds order to the words. Both are needed because change word order can change the sentence meaning.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.0. Combination explanation (implicit) = 1.0. Conceptual clarification (order-change matters) = 0.5. Total: 3.5 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 5.0, "max": 5, "raw": "Encoder-Only: Self-Attention, understand the sentence, Sentiment analysis. Decoder-Only: Masked Self-Attention, Generate output text, Text generation. Why ChatGPT is generative: ChatGPT uses Decoder-only which only can generate Text and masked self attention that blocks the model to see the future Tokens.", "note": "Attention (1.5) + Goal (1.5) + Examples (1.0) + ChatGPT-generative (1.0) = 5.0 (full marks). Matches instructor's mark.", "status": "صحيحة"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444006530": {"sid": "444006530", "name": "عبدالله عمر بن علي الحربى", "score": 27.5, "max": 30, "percent": 91.67, "tier": "A", "tier_color": "#15803d", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 8.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 7.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 8.5, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "1- encoder, 2- decoder, 3- embedding + positional", "note": "Encoder ✓ + Decoder ✓ + Attention ✗ = 0.5 + 0.5 + 0 = 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "it adds order to word so the model knows the sequence and the order matters", "note": "Position information mentioned = 1.0; specific reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "1- query, 2- key, 3- value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q8", "score": 3.0, "max": 3, "raw": "Attention is all you need - machine translation", "note": "Title fully correct = 1.5. Machine Translation precisely named = 1.5. Total: 3.0 / 3 (full marks).", "status": "صحيحة"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q comes from decoder. K, V comes from encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 2.0, "max": 2, "raw": "1- text classification, 2- sentiment analysis", "note": "Two acceptable uses = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q11", "score": 4.0, "max": 4, "raw": "Word Embedding it's encodes meaning and the positional encodes the order, and they combined to both predicts (Generation) and understanding.", "note": "Word Embedding = 1.0. Positional Encoding + reason = 1.5. Combination explanation = 1.0. Additional clarification = 0.5. Total: 4.0 / 4. Matches instructor's mark.", "status": "صحيحة"}, {"q": "Q12", "score": 4.5, "max": 5, "raw": "Encoder-Only: bi-directional attention, understanding, sentiment analysis. Decoder-Only: masked attention, Generation, Question Answering. Why ChatGPT is generative: because it predicts next token.", "note": "Attention (1.5) + Goal (1.5) + Examples (0.5 — decoder side imprecise) + ChatGPT-generative (1.0) = 4.5 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء ممتاز. الطالب يُتقن المفاهيم الأساسية للـ Transformers."}, "444007015": {"sid": "444007015", "name": "عبدالله عماد عبدالله سبحي", "score": 21.0, "max": 30, "percent": 70.0, "tier": "C", "tier_color": "#0e7490", "group": "Group 2", "sections": [{"name": "Short Answer (Q1-Q3)", "score": 4.0, "max": 6}, {"name": "Multiple Choice (Q4-Q7)", "score": 4.0, "max": 8}, {"name": "Short Answer (Q8-Q10)", "score": 6.0, "max": 7}, {"name": "Essay / Long Answer (Q11-Q12)", "score": 7.0, "max": 9}], "questions": [{"q": "Q1", "score": 1.0, "max": 2, "raw": "word embedding, Positional encoder, Attention", "note": "Attention ✓ = 1.0. Encoder and Decoder missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q2", "score": 1.0, "max": 2, "raw": "it adds information about the order of the tokens", "note": "Position information mentioned = 1.0; reason (parallel processing) missing = 0. Total: 1.0 / 2.", "status": "جزئية"}, {"q": "Q3", "score": 2.0, "max": 2, "raw": "Query, Key, Value", "note": "All three correct = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q4", "score": 0, "max": 2, "raw": "C", "note": "C selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q5", "score": 2.0, "max": 2, "raw": "A) True", "note": "True = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q6", "score": 2.0, "max": 2, "raw": "B", "note": "B = correct answer = 2.0.", "status": "صحيحة"}, {"q": "Q7", "score": 0, "max": 2, "raw": "A", "note": "A selected, correct answer is B = 0 / 2.", "status": "خاطئة"}, {"q": "Q8", "score": 2.5, "max": 3, "raw": "Attention is all you need. it converts or translate English to German and also translates English to French.", "note": "Title fully correct = 1.5. Translation task with correct languages described = 1.0 (precise term 'Machine Translation' not used). Total: 2.5 / 3.", "status": "جزئية"}, {"q": "Q9", "score": 2.0, "max": 2, "raw": "Q comes from decoder. K and V comes from encoder.", "note": "Q from decoder + K, V from encoder = 2.0 (full marks).", "status": "صحيحة"}, {"q": "Q10", "score": 1.5, "max": 2, "raw": "sentence similarities, Text compatibility", "note": "One clear correct use (sentence similarities) = 1.0; second use (text compatibility) is imprecise = 0.5. Total: 1.5 / 2.", "status": "جزئية"}, {"q": "Q11", "score": 3.0, "max": 4, "raw": "word embedding converts words to vectors. Positional encoding it adds order for these words.", "note": "Word Embedding = 1.0. Positional Encoding = 1.0. Combination explanation (missing) = 0.5 partial credit. Example (missing) = 0.5 partial credit. Total: 3.0 / 4. Matches instructor's mark.", "status": "جزئية"}, {"q": "Q12", "score": 4.0, "max": 5, "raw": "Encoder-Only: full self attention, understand, (Example tasks: blank with question marks). Decoder-Only: masked self attention, generate, (Example tasks: blank with question marks). Why ChatGPT is generative: because it predicts the next tokens, so if you use it chat GPT will be predicting your next question.", "note": "Attention (1.5) + Goal (1.5) + Examples (0 — both blank) + ChatGPT-generative (1.0) = 4.0 / 5. Matches instructor's mark.", "status": "جزئية"}], "notes": "أداء جيد. يحتاج إلى مزيد من التعمق في تفاصيل الـ Attention و Positional Encoding."}};
+// === STUDENTS_DATA_INLINE_END ===
+
+function doLogin(e) {
+  e.preventDefault();
+  const pwd = document.getElementById('pwd').value;
+  const err = document.getElementById('error-msg');
+  if (pwd === PASSWORD) {
+    err.classList.remove('show');
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
+    sessionStorage.setItem('admin_logged', '1');
+    initDashboard();
+  } else {
+    err.classList.add('show');
+  }
+  return false;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('admin_logged');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('pwd').value = '';
+}
+
+function initDashboard() {
+  const list = Object.values(STUDENTS);
+  const count = list.length;
+  const g1 = list.filter(x => x.group === 'Group 1').length;
+  const g2 = list.filter(x => x.group === 'Group 2').length;
+  const avg = list.reduce((s, x) => s + x.percent, 0) / count;
+  const avgPoints = list.reduce((s, x) => s + x.score, 0) / count;
+  const sorted = [...list].sort((a, b) => b.percent - a.percent);
+  const top = sorted[0];
+  const bot = sorted[sorted.length - 1];
+  const passCount = list.filter(x => x.percent >= 60).length;
+  const failCount = count - passCount;
+
+  document.getElementById('stat-count').textContent = count;
+  document.getElementById('stat-g1').textContent = g1;
+  document.getElementById('stat-g2').textContent = g2;
+  document.getElementById('opt-g1').textContent = 'Group 1 (' + g1 + ')';
+  document.getElementById('opt-g2').textContent = 'Group 2 (' + g2 + ')';
+  document.getElementById('stat-avg').textContent = avg.toFixed(1) + '%';
+  document.getElementById('stat-avg-points').textContent = avgPoints.toFixed(2) + ' / 30';
+  document.getElementById('stat-max').textContent = top.score;
+  document.getElementById('stat-max-name').textContent = top.name;
+  document.getElementById('stat-min').textContent = bot.score;
+  document.getElementById('stat-min-name').textContent = bot.name;
+  document.getElementById('stat-pass').textContent = passCount;
+  document.getElementById('stat-fail').textContent = failCount;
+
+  const tiers = [
+    { name: 'A+ (≥95%)',     color: '#16a34a', filter: (x) => x.percent >= 95 },
+    { name: 'A  (90-94%)',   color: '#15803d', filter: (x) => x.percent >= 90 && x.percent < 95 },
+    { name: 'B+ (85-89%)',   color: '#2563eb', filter: (x) => x.percent >= 85 && x.percent < 90 },
+    { name: 'B  (80-84%)',   color: '#1d4ed8', filter: (x) => x.percent >= 80 && x.percent < 85 },
+    { name: 'C+ (75-79%)',   color: '#0891b2', filter: (x) => x.percent >= 75 && x.percent < 80 },
+    { name: 'C  (70-74%)',   color: '#0e7490', filter: (x) => x.percent >= 70 && x.percent < 75 },
+    { name: 'D+ (65-69%)',   color: '#ca8a04', filter: (x) => x.percent >= 65 && x.percent < 70 },
+    { name: 'D  (60-64%)',   color: '#a16207', filter: (x) => x.percent >= 60 && x.percent < 65 },
+    { name: 'F  (<60%)',     color: '#dc2626', filter: (x) => x.percent < 60 },
+  ].map(t => ({ ...t, count: list.filter(t.filter).length }));
+
+  const dc = document.getElementById('dist-chart');
+  dc.innerHTML = '';
+  const maxC = Math.max(...tiers.map(t => t.count), 1);
+  tiers.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'dist-row';
+    const pct = (t.count / maxC) * 100;
+    if (t.count === 0) {
+      row.innerHTML =
+        '<div class="dist-label" style="color:#94a3b8;">' + t.name + '</div>' +
+        '<div class="dist-bar"><div class="dist-empty">لا يوجد</div></div>' +
+        '<div class="dist-count" style="color:#cbd5e1;">0 / ' + count + '</div>';
+    } else {
+      row.innerHTML =
+        '<div class="dist-label">' + t.name + '</div>' +
+        '<div class="dist-bar"><div class="dist-fill" style="width:0%;background:' + t.color + ';">' + t.count + '</div></div>' +
+        '<div class="dist-count">' + t.count + ' / ' + count + '</div>';
+    }
+    dc.appendChild(row);
+    setTimeout(() => {
+      const fill = row.querySelector('.dist-fill');
+      if (fill) fill.style.width = pct + '%';
+    }, 100);
+  });
+
+  renderTable();
+  loadActivity();
+}
+
+// ===== Login Activity =====
+// To enable: deploy the Apps Script from APPS_SCRIPT_SETUP.md
+// and paste the URL below + use the same password in the script.
+const SCRIPT_URL = ""; // <-- e.g. "https://script.google.com/macros/s/AKfyc.../exec"
+
+let activityRows = null;
+
+function loadActivity() {
+  const container = document.getElementById('activity-content');
+  const refreshIcon = document.getElementById('refresh-icon');
+  const refreshBtn = document.getElementById('refresh-activity');
+
+  if (!SCRIPT_URL) {
+    container.innerHTML =
+      '<div class="activity-error">' +
+      '<b>⚙ نشاط الدخول غير مُفعَّل بعد.</b><br>' +
+      'لتفعيل تسجيل دخول الطلبة:<br>' +
+      '1. اتبع التعليمات في الملف <code>APPS_SCRIPT_SETUP.md</code><br>' +
+      '2. أنشئ Google Apps Script واحصل على رابط الـWeb App<br>' +
+      '3. الصق الرابط في متغير <code>SCRIPT_URL</code> داخل <code>admin.html</code> و <code>index.html</code><br>' +
+      '4. أعد رفع الموقع<br><br>' +
+      '<small>بدون هذا الإعداد، الجدول الأعلى يعرض كل بيانات الطلبة لكن لا يُسجَّل من دخل ومن لم يدخل بعد.</small>' +
+      '</div>';
+    return;
+  }
+
+  refreshBtn.classList.add('spinning');
+  refreshIcon.textContent = '⏳';
+  container.innerHTML = '<div class="activity-loading">جارٍ تحميل بيانات الدخول...</div>';
+
+  // JSONP to bypass CORS
+  const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  let timeoutId = null;
+  const script = document.createElement('script');
+
+  const cleanup = () => {
+    try { delete window[callbackName]; } catch(e) { window[callbackName] = undefined; }
+    if (timeoutId) clearTimeout(timeoutId);
+    if (script.parentNode) script.parentNode.removeChild(script);
+    refreshBtn.classList.remove('spinning');
+    refreshIcon.textContent = '↻';
+  };
+
+  window[callbackName] = function(data) {
+    cleanup();
+    if (!data || !data.ok) {
+      const errMsg = (data && data.error) ? data.error : 'استجابة غير صالحة';
+      container.innerHTML = '<div class="activity-error"><b>خطأ من السيرفر:</b> ' + errMsg + '<br><small>تأكد من كلمة السر في Apps Script.</small></div>';
+      return;
+    }
+    activityRows = data.rows || [];
+    renderActivity();
+  };
+
+  script.src = SCRIPT_URL + '?password=' + encodeURIComponent(PASSWORD) + '&callback=' + callbackName + '&t=' + Date.now();
+  script.onerror = function() {
+    cleanup();
+    container.innerHTML = '<div class="activity-error"><b>خطأ في الاتصال بـ Google Apps Script.</b><br><small>تأكد من أن السكربت منشور ويدعم JSONP. راجع APPS_SCRIPT_SETUP.md</small></div>';
+  };
+  timeoutId = setTimeout(function() {
+    if (window[callbackName]) {
+      cleanup();
+      container.innerHTML = '<div class="activity-error"><b>انتهت المهلة بدون استجابة.</b><br>السيرفر لم يرد خلال 15 ثانية.</div>';
+    }
+  }, 15000);
+  document.head.appendChild(script);
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const ampm = h >= 12 ? 'م' : 'ص';
+  h = h % 12 || 12;
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' — ' + h + ':' + m + ' ' + ampm;
+}
+
+function fmtDateOnly(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDateShort(iso) {
+  const d = new Date(iso);
+  return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function deviceLabel(d) {
+  if (d === 'mobile')  return '📱 موبايل';
+  if (d === 'tablet')  return '📱 تابلت';
+  if (d === 'desktop') return '💻 كمبيوتر';
+  return d || '-';
+}
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000)    return 'قبل ثوانٍ';
+  if (diff < 3600000)  return 'قبل ' + Math.floor(diff/60000) + ' دقيقة';
+  if (diff < 86400000) return 'قبل ' + Math.floor(diff/3600000) + ' ساعة';
+  return 'قبل ' + Math.floor(diff/86400000) + ' يوم';
+}
+
+function renderActivity() {
+  const rows = activityRows || [];
+  const successRows = rows.filter(r => r.status === 'success');
+  const failedRows  = rows.filter(r => r.status === 'failed');
+
+  // Per-student aggregation
+  const perStudent = {};
+  Object.values(STUDENTS).forEach(s => {
+    perStudent[s.sid] = { student: s, logins: [], count: 0, first: null, last: null, devices: new Set(), browsers: new Set() };
+  });
+  successRows.forEach(r => {
+    const p = perStudent[r.uid];
+    if (p) {
+      p.logins.push(r);
+      p.count++;
+      if (r.device)  p.devices.add(r.device);
+      if (r.browser) p.browsers.add(r.browser);
+      const t = new Date(r.timestamp).getTime();
+      if (!p.first || t < new Date(p.first).getTime()) p.first = r.timestamp;
+      if (!p.last  || t > new Date(p.last).getTime())  p.last  = r.timestamp;
+    }
+  });
+
+  const studentsArr = Object.values(perStudent);
+  const loggedInCount = studentsArr.filter(p => p.count > 0).length;
+  const totalStudents = studentsArr.length;
+  const absentCount   = totalStudents - loggedInCount;
+  const totalLogins   = successRows.length;
+  const lastLogin     = successRows.length > 0 ? successRows[successRows.length - 1].timestamp : null;
+
+  // Per-group breakdown
+  const g1Total   = studentsArr.filter(p => p.student.group === 'Group 1').length;
+  const g2Total   = studentsArr.filter(p => p.student.group === 'Group 2').length;
+  const g1LoggedIn= studentsArr.filter(p => p.student.group === 'Group 1' && p.count > 0).length;
+  const g2LoggedIn= studentsArr.filter(p => p.student.group === 'Group 2' && p.count > 0).length;
+
+  // Daily chart
+  const byDay = {};
+  successRows.forEach(r => {
+    const d = fmtDateOnly(r.timestamp);
+    if (!d) return;
+    byDay[d] = (byDay[d] || 0) + 1;
+  });
+  const days = Object.keys(byDay).sort();
+  const maxDay = Math.max(1, ...Object.values(byDay));
+
+  let html = '';
+
+  // Top stats
+  html += '<div class="stats-grid" style="margin-bottom:24px;">';
+  html += '<div class="stat-card purple"><div class="label">إجمالي التسجيلات</div><div class="value">' + totalLogins + '</div><div class="sub">' + (lastLogin ? 'آخر دخول: ' + timeAgo(lastLogin) : 'لا يوجد بعد') + '</div></div>';
+  html += '<div class="stat-card green"><div class="label">طلبة دخلوا</div><div class="value">' + loggedInCount + ' / ' + totalStudents + '</div><div class="sub">شاهدوا نتيجتهم</div></div>';
+  html += '<div class="stat-card orange"><div class="label">طلبة لم يدخلوا</div><div class="value">' + absentCount + '</div><div class="sub">يحتاجون تذكير</div></div>';
+  html += '<div class="stat-card red"><div class="label">محاولات فاشلة</div><div class="value">' + failedRows.length + '</div><div class="sub">أرقام خاطئة</div></div>';
+  html += '<div class="stat-card purple"><div class="label">Group 1 — دخلوا</div><div class="value">' + g1LoggedIn + ' / ' + g1Total + '</div><div class="sub">المجموعة الأولى</div></div>';
+  html += '<div class="stat-card blue"><div class="label">Group 2 — دخلوا</div><div class="value">' + g2LoggedIn + ' / ' + g2Total + '</div><div class="sub">المجموعة الثانية</div></div>';
+  html += '</div>';
+
+  // Daily chart
+  if (days.length > 0) {
+    html += '<div class="activity-section"><h3>الدخول حسب اليوم</h3><div class="day-chart">';
+    days.forEach(d => {
+      const cnt = byDay[d];
+      const h = (cnt / maxDay) * 120;
+      html += '<div class="day-bar-wrap"><div class="day-bar" style="height:' + h + 'px"><span class="day-bar-count">' + cnt + '</span></div><div class="day-bar-label">' + fmtDateShort(d + 'T00:00:00') + '</div></div>';
+    });
+    html += '</div></div>';
+  }
+
+  // Per-student table
+  html += '<div class="activity-section"><h3>نشاط كل طالب</h3>';
+  studentsArr.sort((a, b) => {
+    if (a.count === 0 && b.count > 0) return 1;
+    if (b.count === 0 && a.count > 0) return -1;
+    return b.count - a.count;
+  });
+  html += '<div style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
+  html += '<th>الطالب</th><th>الرقم</th><th>المجموعة</th><th>عدد المرات</th><th>أول دخول</th><th>آخر دخول</th><th>الجهاز</th><th>المتصفح</th>';
+  html += '</tr></thead><tbody>';
+  studentsArr.forEach(p => {
+    const s = p.student;
+    const groupClass = s.group === 'Group 2' ? 'g2' : '';
+    if (p.count > 0) {
+      html += '<tr>' +
+        '<td><span style="font-weight:700;">' + s.name + '</span></td>' +
+        '<td><span style="font-size:12px;color:#64748b;direction:ltr;display:inline-block;">' + s.sid + '</span></td>' +
+        '<td><span class="group-pill ' + groupClass + '">' + s.group + '</span></td>' +
+        '<td><span class="badge-success">' + p.count + ' مرة</span></td>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(p.first) + '</td>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(p.last) + '</td>' +
+        '<td>' + Array.from(p.devices).map(d => '<span class="badge-device">' + deviceLabel(d) + '</span>').join(' ') + '</td>' +
+        '<td>' + Array.from(p.browsers).map(b => '<span class="badge-device">' + b + '</span>').join(' ') + '</td>' +
+      '</tr>';
+    } else {
+      html += '<tr style="opacity:0.7;">' +
+        '<td>' + s.name + '</td>' +
+        '<td><span style="font-size:12px;color:#64748b;direction:ltr;display:inline-block;">' + s.sid + '</span></td>' +
+        '<td><span class="group-pill ' + groupClass + '">' + s.group + '</span></td>' +
+        '<td><span class="badge-not-yet">لم يدخل بعد</span></td>' +
+        '<td colspan="4" style="color:#94a3b8;">—</td>' +
+      '</tr>';
+    }
+  });
+  html += '</tbody></table></div></div>';
+
+  // Absentees
+  const absentList = studentsArr.filter(p => p.count === 0);
+  if (absentList.length > 0) {
+    html += '<div class="activity-section"><h3>الطلبة الذين لم يدخلوا بعد (' + absentList.length + ')</h3><div>';
+    absentList.forEach(p => {
+      html += '<span class="absent-pill"><span class="grp">' + p.student.group.replace('Group ', 'G') + '</span> ' + p.student.name + ' (' + p.student.sid + ')</span>';
+    });
+    html += '</div></div>';
+  }
+
+  // Failed attempts
+  if (failedRows.length > 0) {
+    html += '<div class="activity-section"><h3>محاولات الدخول الفاشلة (' + failedRows.length + ')</h3>';
+    html += '<div style="overflow-x:auto;"><table class="activity-table"><thead><tr>';
+    html += '<th>الوقت</th><th>الرقم المُحاوَل</th><th>الجهاز</th><th>المتصفح</th>';
+    html += '</tr></thead><tbody>';
+    failedRows.slice().reverse().forEach(r => {
+      html += '<tr>' +
+        '<td style="font-size:12px;color:#64748b;">' + fmtDateTime(r.timestamp) + '</td>' +
+        '<td><span style="font-family:monospace;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:4px;">' + (r.attemptedUid || '?') + '</span></td>' +
+        '<td><span class="badge-device">' + deviceLabel(r.device) + '</span></td>' +
+        '<td><span class="badge-device">' + (r.browser || '-') + '</span></td>' +
+      '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  // Full log
+  html += '<div class="activity-section"><h3>سجل التسجيلات الكامل (' + rows.length + ')</h3>';
+  if (rows.length === 0) {
+    html += '<div class="empty-msg">لا توجد تسجيلات دخول بعد. شارك رابط الموقع مع الطلبة.</div>';
+  } else {
+    html += '<div class="activity-log-list">';
+    rows.slice().reverse().forEach(r => {
+      const isSuccess = r.status === 'success';
+      const name = r.name || '(غير معروف)';
+      const uid = r.uid || r.attemptedUid || '?';
+      html += '<div class="log-row">' +
+        '<div class="time">' + fmtDateTime(r.timestamp) + '<br><span style="font-size:10px;color:#94a3b8;">' + timeAgo(r.timestamp) + '</span></div>' +
+        '<div class="who">' + name + ' <span class="uid-small">' + uid + '</span><br><span style="font-size:11px;color:#94a3b8;font-weight:400;">' + deviceLabel(r.device) + ' · ' + (r.browser || '-') + '</span></div>' +
+        '<div>' + (isSuccess ? '<span class="badge-success">ناجح</span>' : '<span class="badge-fail">فاشل</span>') + '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  document.getElementById('activity-content').innerHTML = html;
+}
+
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  const filterGroup = document.getElementById('filter-group').value;
+  const filterTier = document.getElementById('filter-tier').value;
+  const sortBy = document.getElementById('sort-by').value;
+
+  let list = Object.values(STUDENTS);
+  if (search) {
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(search) ||
+      s.sid.includes(search)
+    );
+  }
+  if (filterGroup) list = list.filter(s => s.group === filterGroup);
+  if (filterTier)  list = list.filter(s => s.tier === filterTier);
+
+  if (sortBy === 'rank') {
+    list.sort((a, b) => b.percent - a.percent);
+  } else if (sortBy === 'name') {
+    list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  } else if (sortBy === 'uid') {
+    list.sort((a, b) => a.sid.localeCompare(b.sid));
+  } else if (sortBy === 'group') {
+    list.sort((a, b) => a.group.localeCompare(b.group) || b.percent - a.percent);
+  }
+
+  document.getElementById('filter-count').textContent = list.length + ' طالب';
+
+  const ranked = [...Object.values(STUDENTS)].sort((a, b) => b.percent - a.percent);
+  const rankMap = {};
+  ranked.forEach((s, i) => rankMap[s.sid] = i + 1);
+
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+  list.forEach((s) => {
+    const rank = rankMap[s.sid];
+    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+    const groupClass = s.group === 'Group 2' ? 'g2' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="rank ' + rankClass + '">' + rank + '</span></td>' +
+      '<td><div class="student-name">' + s.name + '</div></td>' +
+      '<td><span class="uid">' + s.sid + '</span></td>' +
+      '<td><span class="group-pill ' + groupClass + '">' + s.group + '</span></td>' +
+      '<td><span class="score-pill" style="background:' + s.tier_color + '20;color:' + s.tier_color + '">' + s.score + ' / ' + s.max + '</span></td>' +
+      '<td style="font-weight:900;">' + s.percent.toFixed(1) + '%</td>' +
+      '<td><span class="tier-pill" style="background:' + s.tier_color + '">' + s.tier + '</span></td>' +
+      '<td><div class="actions-cell">' +
+        '<button class="action-btn view-btn" onclick="showStudent(\'' + s.sid + '\')" title="عرض التفاصيل">عرض</button>' +
+        '<a href="reports/' + s.sid + '.html" target="_blank" class="action-btn report-btn" title="التقرير الكامل">التقرير</a>' +
+        '<a href="answer_pdfs/' + s.sid + '.pdf" target="_blank" class="action-btn answer-btn" title="ورقة الإجابة (PDF كاملة)">الإجابة PDF</a>' +
+      '</div></td>';
+    body.appendChild(tr);
+  });
+
+  if (list.length === 0) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">لا توجد نتائج تطابق البحث</td></tr>';
+  }
+}
+
+function statusClass(status) {
+  if (status === 'صحيحة') return 'status-correct';
+  if (status === 'خاطئة') return 'status-wrong';
+  return 'status-partial';
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+function showStudent(sid) {
+  const s = STUDENTS[sid];
+  document.getElementById('modal-title').textContent = s.name + ' — ' + s.sid;
+
+  const circumference = 2 * Math.PI * 56;
+  const dash = (circumference * s.percent / 100);
+
+  let bd = '<div class="modal-grade-row">' +
+    '<div class="modal-circle"><svg viewBox="0 0 130 130">' +
+      '<circle cx="65" cy="65" r="56" fill="none" stroke="#f1f5f9" stroke-width="10"/>' +
+      '<circle cx="65" cy="65" r="56" fill="none" stroke="' + s.tier_color + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + dash + ' ' + circumference + '"/>' +
+    '</svg><div class="text-overlay"><div class="percent">' + s.percent.toFixed(1) + '%</div><div class="of">' + s.score + ' / ' + s.max + '</div></div></div>' +
+    '<div><div style="font-size:14px;color:#64748b;margin-bottom:4px;">الاسم الكامل:</div><div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:8px;">' + s.name + '</div>' +
+    '<div style="margin-bottom:10px;"><span class="group-pill ' + (s.group === 'Group 2' ? 'g2' : '') + '">' + s.group + '</span></div>' +
+    '<span class="tier-pill" style="background:' + s.tier_color + ';font-size:14px;padding:6px 18px;">' + s.tier + '</span></div></div>';
+
+  bd += '<div class="modal-section"><h3>توزيع الدرجة على الأقسام</h3><div class="breakdown-grid-modal">';
+  s.sections.forEach(sec => {
+    bd += '<div class="breakdown-modal"><div class="name">' + sec.name + '</div><div><span class="val">' + sec.score + '</span> <span class="of">/ ' + sec.max + '</span></div></div>';
+  });
+  bd += '</div></div>';
+
+  bd += '<div class="modal-section"><h3>ملاحظات وتوصيات</h3><div class="notes-box">' + escapeHtml(s.notes) + '</div></div>';
+
+  bd += '<div class="modal-section"><h3>التصحيح التفصيلي — سؤال سؤال</h3><div style="overflow-x:auto;"><table class="qtable"><thead><tr>' +
+    '<th>السؤال</th><th>إجابة الطالب</th><th>الحالة</th><th>الدرجة</th><th>الملاحظة</th></tr></thead><tbody>';
+  s.questions.forEach(q => {
+    bd += '<tr><td><span class="q-badge2">' + q.q + '</span></td>' +
+      '<td style="font-family:Consolas,monospace;font-size:12px;max-width:300px;">' + escapeHtml(q.raw) + '</td>' +
+      '<td><span class="' + statusClass(q.status) + '">' + q.status + '</span></td>' +
+      '<td style="font-weight:700;">' + q.score + ' / ' + q.max + '</td>' +
+      '<td style="color:#475569;font-size:12px;max-width:400px;">' + escapeHtml(q.note) + '</td></tr>';
+  });
+  bd += '</tbody></table></div></div>';
+
+  bd += '<div class="modal-actions">' +
+    '<a href="reports/' + s.sid + '.html" target="_blank" class="btn btn-primary">📄 التقرير الكامل</a>' +
+    '<a href="answer_pdfs/' + s.sid + '.pdf" target="_blank" class="btn btn-secondary">🖼️ ورقة الإجابة (PDF كاملة)</a>' +
+    '</div>';
+
+  document.getElementById('modal-body').innerHTML = bd;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+if (sessionStorage.getItem('admin_logged') === '1') {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+  initDashboard();
+} else {
+  document.getElementById('pwd').focus();
+}
+</script>
+</body>
+</html>
